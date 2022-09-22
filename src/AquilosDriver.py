@@ -306,7 +306,7 @@ class fibsem:
         stagepos=StagePosition(x=x,y=y,z=z,t=t,r=r)
         microscope.specimen.stage.relative_move(stagepos)
         return("Stage Moved")
-    def align(self,image,beam,current=1.0e-11):
+    def align(self,image,beam,current=1.0e-11, NO_BEAMSHIFT = False):
         '''
         Input: Alignment image, Beam ("ION" or "ELECTRON"), optionally current but replaced by the GUI option
         Output: None
@@ -434,7 +434,7 @@ class fibsem:
                     print("Deviation (in meters): " + str(distance))
 
 
-                    if distance > 1e-05:
+                    if distance > 1e-05 or NO_BEAMSHIFT:
                         # move stage and reset beam shift
                         print("Moving stage by ("+str(x)+","+str(y)+") and resetting beam shift...")
                         #self.log_output = self.log_output + "Moving stage by ("+str(x)+","+str(y)+") and resetting beam shift... \n"
@@ -665,6 +665,19 @@ class fibsem:
 
         return()
 
+    def get_HFW(self, beam="ELECTRON"):
+        if beam == "ELECTRON":
+            value = microscope.beams.electron_beam.horizontal_field_width.value
+            return value
+        elif beam == "ION":            
+            value = microscope.beams.ion_beam.horizontal_field_width.value
+            return value
+
+    def set_HFW(self, beam="ELECTRON", hfw = 300e-6):
+        if beam == "ELECTRON":
+            microscope.beams.electron_beam.horizontal_field_width.value = hfw
+        elif beam == "ION":
+            microscope.beams.ion_beam.horizontal_field_width.value = hfw
 
 
     def auto_focus(self,beam="ELECTRON"):
