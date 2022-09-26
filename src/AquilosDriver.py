@@ -38,6 +38,7 @@ microscope = SdbMicroscopeClient()
 
 from autoscript_toolkit.template_matchers import *
 import autoscript_toolkit.vision as vision_toolkit
+from src.custom_matchers_v3 import *
 
 from src.custom_matchers_v2 import *
 from src.read_SAV import read_SAV_params
@@ -48,6 +49,7 @@ import xml.etree.ElementTree as ET
 import os
 import datetime
 import sys
+import math
 
 try:
     microscope.connect()
@@ -270,6 +272,7 @@ class fibsem:
         #### Microscope independent code####
         stage_dict={'x':float(x),'y':float(y),'z':float(z),'r':float(r),'t':float(t)}
         return(stage_dict)
+
     def moveStageAbsolute(self, stageposition):
         '''
         Input: Stage position as dictionnary
@@ -586,6 +589,116 @@ class fibsem:
                 microscope.beams.electron_beam.horizontal_field_width.value = old_mag
 
         return()
+
+    def findRotationCenter(self, deltaR_deg: float = 2.5, iterations: int = 10, current=13e-12):
+        # Tries to align to a position on the grid after a small rotation
+
+        # Init running variables
+        deltaR = deltaR_deg * math.pi / 180
+        itrations = 10
+        rotation_center = (.0,.0)  
+        pos_rotation = []
+        pos_rotation_aligned = []   
+        pos_estimated = []     
+
+        # Initializing imaging mode
+        self.set_HFW("ELECTRON", 3e-3)
+        img_resolution = '1536x1024'        
+        microscope.beams.electron_beam.scanning.resolution.value = img_resolution
+        microscope.beams.electron_beam.beam_shift.value = Point(0, 0)
+
+        # Init matcher
+        favourite_matcher = CustomCVMatcher('phase')
+
+        img_reference = self.take_image_EB()
+        pos_alignment = self.getStagePosition()
+
+        for i in range(itrations):
+            # Calculate new angle
+            angle = (i+1) * deltaR
+
+            # Estimate coordinates of rotated point with estimated center of rotation
+            pos_estimated_vector = self.get_rotation_matrix_offset(angle,rotation_center) *\
+                np.array([pos_alignment['x'], pos_alignment['y'],1])
+            pos_estimated.append(pos_alignment)
+            pos_estimated[i]['x'] = pos_estimated_vector[0]
+            pos_estimated[i]['y'] = pos_estimated_vector[1]
+            pos_estimated[i]['r'] =  pos_alignment['r'] - angle
+
+            #Execute stage move
+            self.moveStageAbsolute(pos_estimated[i])
+
+            #Take alignment image and save position
+            img_rotated = self.take_image_EB()
+
+            #Align images and save the offset
+            l = vision_toolkit.locate_feature(img_reference, img_rotated, favourite_matcher)
+            print("Current confidence: " + str(l.confidence))
+            move_count = 0
+
+            # Try to reduce offset as much as possible in three x-y-moves
+            while l.confidence < 0.98 and move_count < 3:
+                x = l.center_in_meters.x * -1  # sign may need to be flipped depending on matcher
+                y = l.center_in_meters.y * -1
+                distance = np.sqrt(x ** 2 + y ** 2)
+                print("Deviation (in meters): " + str(distance))
+                if distance > 1e-05:
+                    # move stage and reset beam shift
+                    print("Moving stage by ("+str(x)+","+str(y)+") and resetting beam shift...")
+                    #self.log_output = self.log_output + "Moving stage by ("+str(x)+","+str(y)+") and resetting beam shift... \n"
+
+                    rotation = microscope.beams.electron_beam.scanning.rotation.value
+                    possible_rotations = [0, 3.14]
+                    num=min(possible_rotations, key=lambda x: abs(x - rotation))
+                    print(num)
+                    if num==0:
+                        pos_corr = StagePosition(coordinate_system='Specimen', x=-x, y=-y)
+                    if num==3.14:
+                        pos_corr = StagePosition(coordinate_system='Specimen', x=x, y=y)
+                    microscope.specimen.stage.relative_move(pos_corr)
+                    microscope.beams.electron_beam.beam_shift.value = Point(0,0)
+
+                move_count += 1
+                img_rotated = self.take_image_EB()
+                l = vision_toolkit.locate_feature(img_reference, img_rotated, favourite_matcher)
+
+            pos_rotation_aligned.append(self.getStagePosition())
+
+            # Calculate the difference between the rotated and aligned position
+            rotation_difference = {key: pos_rotation_aligned[key] - pos_rotation.get(key, 0) for key in pos_rotation_aligned}
+            rotation_difference_vector = np.array(rotation_difference['x'], rotation_difference['y'])
+
+            rotation_center_new = self.get_rotation_matrix_inverse(angle) * rotation_difference_vector
+            
+            rotation_center = rotation_center + (rotation_center - rotation_center_new) * 0.75
+
+
+            
+        microscope.beams.electron_beam.scanning.resolution.value = old_resolution
+        microscope.beams.electron_beam.horizontal_field_width.value = old_mag
+        return()
+
+    def get_rotation_matrix_inverse(self,angle: float):
+        '''
+        Input: Delta Rotation of the the stage in radians\n
+        Output: Matrix of the shape:\n
+        (2 - 2*cos(phi)) ** (-1) *  [ 1-cos(phi) , -sin(phi) ; sin(phi) , 1-cos(phi) ]
+        '''
+        c,s = np.cos(angle), np.sin(angle)
+        determinant = (2 - 2 * c) ** -1
+        matrix = np.matrix([[1-c, -s], [s, 1-c]])
+        return(determinant * matrix)
+
+    def get_rotation_matrix_offset(self,angle, origin = (0,0)):
+        '''
+        Input: Delta Rotation of the the stage in radians, Tuple of rotation center\n
+        Output: npmy rotation Matrix 3x3
+        '''
+        c,s = np.cos(angle), np.sin(angle)
+        x,y = origin[0], origin[1]
+        matrix = np.array([[c, -s, x - c*x + s*y],[s , c,  y - s*x - c*y],[0,0,1]])
+
+
 
     def align_current(self,new_current,beam='ION'):
         '''
