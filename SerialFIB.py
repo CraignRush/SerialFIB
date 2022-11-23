@@ -49,6 +49,11 @@ from src.Param3D import Param3D
 ### INITIALIZE MICROSCOPE FROM DRIVER
 scope=fibsem()
 ###
+
+### Initialize Meteor
+
+###
+
 ### IMPORT EXTERNAL PACKAGES
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPainter
@@ -114,6 +119,8 @@ class Ui_MainWindow(object):
         self.custommillprotocol=r'./testprotocol.pro'
         self.custompatternfile=r'./patternfile.pf'
         self.settings=r'./standard.settings'
+        self.patternfile_trench=r'./ScriptingExamples/FilesForWaffleDev/Trenches.pf'
+        self.patternfile_notch=r'./ScriptingExamples/FilesForWaffleDev/Notch.pf'
         self.number=0
         self.threads=[]
         # Logfile initialization
@@ -264,6 +271,9 @@ class Ui_MainWindow(object):
         self.Button_LoadCorrelationImages = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
         self.Button_LoadCorrelationImages.setObjectName("Button_LoadCorrelationImages")
         self.verticalLayout_4.addWidget(self.Button_LoadCorrelationImages)
+        self.Button_RunWaffleMilling = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
+        self.Button_RunWaffleMilling.setObjectName("Button_RunWaffleMilling")
+        self.verticalLayout_4.addWidget(self.Button_RunWaffleMilling)
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(710, 10, 141, 16))
         self.label_3.setObjectName("label_3")
@@ -339,6 +349,9 @@ class Ui_MainWindow(object):
         self.Button_RunCustomPatternfile = QtWidgets.QPushButton(self.verticalLayoutWidget_2)
         self.Button_RunCustomPatternfile.setObjectName("Button_RunCustomPatternfile")
         self.verticalLayout_2.addWidget(self.Button_RunCustomPatternfile)
+        self.Slider_StackSelector = QtWidgets.QSlider(0x1, self.verticalLayoutWidget_2)
+        self.Slider_StackSelector.setObjectName("Slider_StackSelector")
+        self.verticalLayout_2.addWidget(self.Slider_StackSelector)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1070, 22))
@@ -413,12 +426,22 @@ class Ui_MainWindow(object):
         self.actionSet_Custom_Protocol.setObjectName("actionSet_Custom_Protocol")
         self.actionSet_Custom_Milling = QtWidgets.QAction(MainWindow)
         self.actionSet_Custom_Milling.setObjectName("actionSet_Custom_Milling")
-        self.actionSet_MeteorMoveTo = QtWidgets.QAction(MainWindow)
-        self.actionSet_MeteorMoveTo.setObjectName("actionSet_Meteor_Move_To")       
-        self.menuMeteor.addAction(self.actionSet_MeteorMoveTo)
-        self.actionSet_MeteorMoveFrom = QtWidgets.QAction(MainWindow)
-        self.actionSet_MeteorMoveFrom.setObjectName("actionSet_Meteor_Move_From")       
-        self.menuMeteor.addAction(self.actionSet_MeteorMoveFrom)
+        self.actionSet_Trench_Milling = QtWidgets.QAction(MainWindow)
+        self.actionSet_Trench_Milling.setObjectName("actionSet_Trench_Milling")        
+        self.actionSet_Notch_Milling = QtWidgets.QAction(MainWindow)
+        self.actionSet_Notch_Milling.setObjectName("actionSet_Notch_Milling")
+        self.actionSet_Meteor_Move_To = QtWidgets.QAction(MainWindow)
+        self.actionSet_Meteor_Move_To.setObjectName("actionSet_Meteor_Move_To")       
+        self.menuMeteor.addAction(self.actionSet_Meteor_Move_To)
+        self.actionSet_Meteor_Move_From = QtWidgets.QAction(MainWindow)
+        self.actionSet_Meteor_Move_From.setObjectName("actionSet_Meteor_Move_From")       
+        self.menuMeteor.addAction(self.actionSet_Meteor_Move_From)
+        self.actionSet_Meteor_GetRotationCenter = QtWidgets.QAction(MainWindow)
+        self.actionSet_Meteor_GetRotationCenter.setObjectName("actionSet_Meteor_Get_Rotation_Center")       
+        self.menuMeteor.addAction(self.actionSet_Meteor_GetRotationCenter)
+        self.actionSet_Load_Stack = QtWidgets.QAction(MainWindow)
+        self.actionSet_Load_Stack.setObjectName("actionSet_Meteor_Load_Stack")       
+        self.menuMeteor.addAction(self.actionSet_Load_Stack)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave_Session)
         self.menuFile.addAction(self.actionLoad_Session)
@@ -440,8 +463,11 @@ class Ui_MainWindow(object):
         self.menuSettings.addAction(self.actionSet_SAV_parameters)
         self.menuSettings.addAction(self.actionSet_Rough_Mill_protocol)
         self.menuSettings.addAction(self.actionSet_Fine_Mill_protocol)
-        self.menuSettings.addAction(self.actionSet_Custom_Protocol)
-        self.menuSettings.addAction(self.actionSet_Custom_Milling)
+        self.menuSettings.addAction(self.actionSet_Custom_Protocol)        
+        self.menuSettings.addAction(self.actionSet_Custom_Milling)     
+        self.subMenu_Waffle = self.menuSettings.addMenu("Waffle")            
+        self.subMenu_Waffle.addAction(self.actionSet_Trench_Milling)
+        self.subMenu_Waffle.addAction(self.actionSet_Notch_Milling)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
         self.menubar.addAction(self.menuCorrelation.menuAction())
@@ -475,7 +501,8 @@ class Ui_MainWindow(object):
         self.Button_RunTrenchMilling.setText(_translate("MainWindow", "Run Trench Milling"))
         #self.Button_RunRoughMilling.setText(_translate("MainWindow", "Run Rough Milling"))
         #self.Button_RunFineMilling.setText(_translate("MainWindow", "Run Fine Milling"))
-        self.Button_LoadCorrelationImages.setText(_translate("MainWindow", "Load Correlation Images"))
+        self.Button_LoadCorrelationImages.setText(_translate("MainWindow", "Load Correlation Images"))        
+        self.Button_RunWaffleMilling.setText(_translate("MainWindow", "Run Waffle Milling"))
         self.label_3.setText(_translate("MainWindow", "Alignment Image"))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Label"))
@@ -507,7 +534,7 @@ class Ui_MainWindow(object):
         self.Button_SetSAVparameters.setText(_translate("MainWindow", "Set SAV parameters"))
         self.Button_RunVolumeImaging.setText(_translate("MainWindow", "Run Volume Imaging"))
         self.Button_RunCustomProtocol.setText(_translate("MainWindow", "Run Custom Protocol"))
-        self.Button_RunCustomPatternfile.setText(_translate("MainWindow", "Run Custom Patternfile"))
+        self.Button_RunCustomPatternfile.setText(_translate("MainWindow", "Run Custom Patternfile"))   
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuTools.setTitle(_translate("MainWindow", "Tools"))
         self.menuCorrelation.setTitle(_translate("MainWindow", "Correlation"))
@@ -541,8 +568,13 @@ class Ui_MainWindow(object):
         self.actionSet_Fine_Mill_protocol.setText(_translate("MainWindow", "Set Fine Mill protocol"))
         self.actionSet_Custom_Protocol.setText(_translate("MainWindow", "Set Custom Protocol"))
         self.actionSet_Custom_Milling.setText(_translate("MainWindow", "Set Custom Milling"))
-        self.actionSet_MeteorMoveFrom.setText(_translate("MainWindow", "Move away"))
-        self.actionSet_MeteorMoveTo.setText(_translate("MainWindow", "Move To"))
+        self.subMenu_Waffle.setTitle(_translate("MainWindow", "Waffle"))
+        self.actionSet_Notch_Milling.setText(_translate("MainWindow", "Set Notch Pattern"))        
+        self.actionSet_Trench_Milling.setText(_translate("MainWindow", "Set Trench Pattern"))
+        self.actionSet_Meteor_Move_From.setText(_translate("MainWindow", "Move away"))
+        self.actionSet_Meteor_Move_To.setText(_translate("MainWindow", "Move To"))        
+        self.actionSet_Meteor_GetRotationCenter.setText(_translate("MainWindow", "Calibrate Rot Center"))
+        self.actionSet_Load_Stack.setText(_translate("MainWindow", "Load Stack"))
 ##################################
 ####  BUTTON DEFINITIONS #########
 ##################################
@@ -602,7 +634,9 @@ class Ui_MainWindow(object):
         # Button Save Patterns
         self.Button_SavePatterns.pressed.connect(self.button_savePatterns)
         # Button Load Correlated Image
-        self.Button_LoadCorrelationImages.pressed.connect(self.load_correlated_image)
+        self.Button_LoadCorrelationImages.pressed.connect(self.load_correlated_image)        
+        # Button Run Waffle Milling
+        self.Button_RunWaffleMilling.pressed.connect(self.wafflemill)
         # Button Set Output Directory
         self.Button_SetOutputDirectory.pressed.connect(self.define_directory)
         self.Button_UpdateZ.pressed.connect(self.UpdateZ)
@@ -614,6 +648,10 @@ class Ui_MainWindow(object):
         self.Button_RunCustomProtocol.pressed.connect(self.customprotocol)
         self.Button_RunTrenchMilling.pressed.connect(self.trenchmill)
         self.Button_RunCustomPatternfile.pressed.connect(self.custompatternfilerun)
+        # Slider for stack looping
+        self.Slider_StackSelector.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.Slider_StackSelector.valueChanged.connect(self.update_stack)
+        self.Slider_StackSelector.setRange(0,2)
         '''
         File Tab
         '''
@@ -649,14 +687,18 @@ class Ui_MainWindow(object):
         self.actionSet_Rough_Mill_protocol.triggered.connect(self.define_roughmillprotocol)
         self.actionSet_Fine_Mill_protocol.triggered.connect(self.define_finemillprotocol)
         self.actionSet_Custom_Protocol.triggered.connect(self.define_custommillprotocol)
-        self.actionSet_Custom_Milling.triggered.connect(self.define_custompatternfile)
+        self.actionSet_Custom_Milling.triggered.connect(self.define_custompatternfile)        
+        self.actionSet_Trench_Milling.triggered.connect(self.define_patternfile_trench)        
+        self.actionSet_Notch_Milling.triggered.connect(self.define_patternfile_notch)
         self.actionSaveSettings.triggered.connect(self.save_settings)
         self.actionLoadSettings.triggered.connect(self.load_settings)
         '''
         METEOR Tab
         '''
-        self.actionSet_MeteorMoveFrom.triggered.connect(self.meteor_move_from)       
-        self.actionSet_MeteorMoveTo.triggered.connect(self.meteor_move_to)
+        self.actionSet_Meteor_Move_From.triggered.connect(self.meteor_move_from)       
+        self.actionSet_Meteor_Move_To.triggered.connect(self.meteor_move_to)
+        self.actionSet_Meteor_GetRotationCenter.triggered.connect(self.meteor_calibrate_rotation)
+        self.actionSet_Load_Stack.triggered.connect(self.load_stack)
         '''
         TestButtons
         '''
@@ -673,61 +715,45 @@ class Ui_MainWindow(object):
     ##################################
 
     def meteor_move_to(self):
-        self.meteor_move('TO')
-
+        scope.move_to_METEOR(scope.getStagePosition())
+        return
 
     def meteor_move_from(self):
-        self.meteor_move('FROM')
+        scope.move_from_METEOR()
+        return
 
+    def meteor_calibrate_rotation(self):
+        #implement
+        scope.find_rotation_center()
+        return
 
-    def meteor_move(self,direction: str):
+    def update_stack(self, value):
+        ## Set the new slicer here
+        #print(self.ImageBufferImages.currentItem.data)
+        self.display_image_in_scene(self.ImageBufferImages[self.ImageBuffer.currentRow()])
+        pass
+
+    def load_stack(self):
+        from skimage import io
+        projfile=QtWidgets.QFileDialog.getOpenFileNames(None, "Fluorescence Stack",self.output_dir,"Images (*.tif; *.tiff)")
+        if projfile == ('', ''):
+                return
         try:
-            stagepos=scope.getStagePosition()
-            print("")           
-            self.StagePos=stagepos
-
+            img = io.imread(projfile[0][0], plugin="tifffile")
+            print(img.shape)
+            numRows = self.ImageBuffer.count()
+            self.ImageBuffer.addItem(str(numRows) + " (Image Stack)")
+            self.ImageBuffer.setCurrentRow(numRows)
+            self.ImageBufferImages.append(img)            
+            self.display_image_in_scene(img)
+            # New Image cannot have fluorescence information, thus set checkBox to false
+            self.checkBox_fluo.setChecked(False)
+            # Adjust ImageBufferHandle to new Image
+            self.ImageBufferHandle=self.ImageBuffer.count()+1
         except:
-            print("Error, No Microscope Connected")
-            stagepos=scope.getStagePosition()
-            self.StagePos=stagepos 
-
-        new_position = self.calculate_meteor_move(stagepos,direction)
-        print('Calculated Move Position / mm: x: {}, y: {}, z: {}, t: {}, r: {} {}'.format(round(new_position['x']*1e3,4), \
-            round(new_position['y']*1e3,4), round(new_position['z']*1e3,4), round(new_position['t']*57.2968,2), \
-            round(new_position['r']*57.2968,2), round((float(new_position['r'])*57.2968)-360,2)))
-        try:
-            if False:
-                scope.moveStageAbsolute(new_position)
-            else:
-                print('Move to Meteor carried out')
-        except:            
-            print("Move to Meteor Failed")
-
-
-    def calculate_meteor_move(self, origin: dict, direction: str):
-
-        if direction == 'TO':
-            sign = 1
-        elif direction == 'FROM':
-            sign = -1
-        else:
-            raise("Wrong Call in Meteor Move")       
-
-        origin = scope.getStagePosition() 
-
-        position = {}
-        position['x'] = sign * 49.3904e-3 + origin['x']
-        position['y'] = sign * 0.027e-3   + origin['y']
-        position['z'] = sign * -0.0274e-3 + origin['z']
-        position['t'] = origin['t']
-        position['r'] = origin['r']
-
-        if [position['x'],position['y']] == ['0','0']:
-            print("ERROR: Invalid Stage Position") 
-
-        return position
-
-
+            print("Incorrect file selected")
+            print(sys.exc_info())
+        return
 
 
 ##################################
@@ -772,26 +798,70 @@ class Ui_MainWindow(object):
             else:
                 array=img.data
                 self.ImageBufferImages.append(img)
-        ### Convert 16 bit image to 8 bit to show it in the GraphicsView
-        array8u=cv2.convertScaleAbs(array, alpha=(255.0/65535.0))
-        img_8bit=np.uint8(array)
-        height,width=np.shape(img_8bit)
-        qImg=QtGui.QImage(img_8bit, width, height, QtGui.QImage.Format_Grayscale8)
-        pixmapImg=QtGui.QPixmap.fromImage(qImg)
+        
+        # New Image cannot have fluorescence information, thus set checkBox to false
+        self.checkBox_fluo.setChecked(False)
+        # Adjust ImageBufferHandle to new Image
+        self.ImageBufferHandle=self.ImageBuffer.count()+1
+        return()
+
+    def display_image_in_scene(self, img):
+        if len(img.shape) == 3:            
+            self.Slider_StackSelector.setMaximum(img.shape[2])
+            array = np.uint8(img[:,:,self.Slider_StackSelector.value()].data)
+            self.Slider_StackSelector.setMaximum(img.shape[2]-1)
+            #print("Slice selected:{}".format(self.Slider_StackSelector.value()))
+        elif len(img.shape) == 4:            
+            self.Slider_StackSelector.setMaximum(img.shape[0]-1)
+            #print('Multichannel image selected')
+            slice = self.Slider_StackSelector.value()
+            channel = 0
+            array_lut = np.array([])
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            colors = ('green', 'red', 'white', 'magenta', 'cyan', 'yellow') #need to do because dicts are unordered in 3.5.2
+            for i in range(img.shape[3]):
+                # local contrast enhancement                
+                array_norm = clahe.apply(img[slice,:,:,channel])
+                #create lut
+                projColor = np.array(self.colordict[colors[i]],dtype=np.uint8)
+                scale = np.array([ i/256.0 for i in range (0,256)]).clip(0,1) #a little brightness,contrast enhancement
+                LUT = np.tile(projColor,[1,256])
+                LUT = np.array([ np.round(LUT[:,i] * scale) for i in range(3)],dtype=np.uint8)
+                array_norm_lut= np.array([cv2.LUT(array_norm, LUT[i,:]) for i in range(3)])
+                # the next three lines slow the slice-sweeping a little down. Consider optimizing
+                #array_normalized = cv2.normalize(array_unnormalized, None, alpha=0, beta=1.2, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)                    
+                #array_normalized = np.clip(array_normalized, 0, 1)
+                #array_normalized = (255*array_normalized).astype(np.uint8)    
+                channel = channel + 1
+                if i == 0:
+                    array_sum = array_norm_lut
+                else:
+                    array_sum += array_norm_lut
+            array = np.moveaxis(array_sum,0,-1)
+        if array.dtype == np.uint16:
+            array = cv2.convertScaleAbs(array, alpha=(255.0/65535.0))        
+        height,width=np.shape(array)[:2]
+        ##TODO: Adjust historgam
+        if len(img.shape) == 4:
+            qImg=QtGui.QImage(array.data.tobytes(), width, height, QtGui.QImage.Format_RGB888)#QtGui.QImage.Format_RGBA8888)
+        else:
+            qImg=QtGui.QImage(array.astype(np.uint8), width, height, QtGui.QImage.Format_Grayscale8)
+        try:    
+            pixmapImg=QtGui.QPixmap.fromImage(qImg)
+        except:
+            print(sys.exc_info())
+            return
         # Set scene size to image size.
+        scene=self.get_scene()
+        scene.clear()
+        self.graphicsView.setScene(scene)
         self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect())) 
         self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
-        w2=self.graphicsView.sceneRect().width()
-        h2=self.graphicsView.sceneRect().height()
         #Add Image as pixmap to scene
         scene.addPixmap(pixmapImg)
         # Update SceneBuffer
         self.scene=scene
         self.sceneBuffer.append(self.scene)
-        # New Image cannot have fluorescence information, thus set checkBox to false
-        self.checkBox_fluo.setChecked(False)
-        # Adjust ImageBufferHandle to new Image
-        self.ImageBufferHandle=self.ImageBuffer.count()+1
         return()
 ##################################
 # /CODE:Button_take_image_IB     #
@@ -898,10 +968,12 @@ class Ui_MainWindow(object):
         print("Result: "+result)
         self.progressDialog.close()
         return()
-    def showInGraphview(self):
+    def showInGraphview(self, item):
         #self.savePatterns()
+        #print(item)
         try:
-            number=self.ImageBuffer.currentItem().text().split(" ")[0]
+           number=self.ImageBuffer.currentItem().text().split(" ")[0]
+           #number=self.ImageBuffer.currentRow()
         except:
             number=0
         self.ImageBufferHandle=number
@@ -1448,6 +1520,9 @@ class Ui_MainWindow(object):
 ####################################
 #/CODE:Correlative mill functions  #
 ####################################
+
+
+
 ####################################
 # CODE:Define buttons              #
 ####################################
@@ -1476,7 +1551,7 @@ class Ui_MainWindow(object):
             self.roughmillprotocol=filename[0][0]
         except:
             print('No proper file selected.')
-        return()
+        return ()        
     def define_finemillprotocol(self):
         from os.path import expanduser
         filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File",self.output_dir,"Protocol file (*.pro)")
@@ -1498,6 +1573,22 @@ class Ui_MainWindow(object):
         filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File",self.output_dir,"Protocol file (*.pf)")
         try:
             self.custompatternfile=filename[0][0]
+        except:
+            print('No proper file selected.')
+        return ()
+    def define_patternfile_notch(self):
+        from os.path import expanduser
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Pattern File for Notches",self.output_dir,"Pattern file (*.pf)")
+        try:
+            self.patternfile_notch=filename[0][0]
+        except:
+            print('No proper file selected.')
+        return ()        
+    def define_patternfile_trench(self):
+        from os.path import expanduser
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Pattern File for Trenches",self.output_dir,"Pattern file (*.pf)")
+        try:
+            self.patternfile_trench=filename[0][0]
         except:
             print('No proper file selected.')
         return()
@@ -1898,6 +1989,50 @@ class Ui_MainWindow(object):
                             print("Operation terminated")
             self.progressDialog.close()
             self.Signal_Done('Rough Mill stopped')
+        except:
+            print("Something went wrong with the setup.")
+            print(sys.exc_info())
+        self.progressDialog.close()
+        return ()
+        
+    def wafflemill(self):
+        try:
+            self.progressDialog = QtWidgets.QDialog()
+            verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
+            label = QtWidgets.QLabel("Running waffle milling protocol",self.progressDialog)
+            verticalLayout.addWidget(label)
+            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
+            self.number            
+            for steps in range(3):
+                self.threads.append(WaffleMillThread())
+                WaffleMillThread=self.threads[self.number]
+                self.number = self.number + 1  
+                WaffleMillThread.__init__()
+                WaffleMillThread.step = steps
+                WaffleMillThread.start()
+                buttonBox.rejected.connect(self.progressDialog.reject)
+                verticalLayout.addWidget(buttonBox)
+                scope.continuerun = True
+                while wafflemill_thread.isRunning():
+                    if self.progressDialog.exec() == QtWidgets.QDialog.Rejected:
+                        self.Signal_Done('waffle milling stopped')
+                        #scope.stop_patterning()
+                        print("waffle milling  stopped")
+                    #
+                        while WaffleMillThread.isRunning():
+                            from autoscript_sdb_microscope_client.enumerations import PatterningState
+                            if scope.is_idle():
+                                continue
+                            else:
+                                scope.stop_patterning()
+                                scope.stop()
+                                scope.continuerun=False
+                                WaffleMillThread.continuerun=False
+                                WaffleMillThread.stop()
+                                self.progressDialog.close()
+                                print("Operation terminated")
+            self.progressDialog.close()
+            self.Signal_Done('Waffle Milling stopped')
         except:
             print("Something went wrong with the setup.")
             print(sys.exc_info())
@@ -2396,7 +2531,7 @@ class VolumeImagingThread(QtCore.QThread):
                         log_out_new = scope.run_SAV(label, alignment_image, stagepos, pattern_dir, paramsfile)
                         ui.log_out = ui.log_out + log_out_new
                     ui.sysout.write(ui.log_out)
-            self.signal.emit("Fine Protocol done!")
+            self.signal.emit("Volume Protocol done!")
             self.quit()
             ui.progressDialog.close()
         except:
@@ -2438,7 +2573,7 @@ class CustomPatternfileThread(QtCore.QThread):
                                                                protocolfile)
                         ui.log_out = ui.log_out + log_out_new
                     ui.sysout.write(ui.log_out)
-            self.signal.emit("Fine Protocol done!")
+            self.signal.emit("Custom Protocol done!")
             #return True
             self.quit()
             ui.progressDialog.close()
@@ -2447,15 +2582,103 @@ class CustomPatternfileThread(QtCore.QThread):
             print(sys.exc_info())
             self.quit()
             ui.progressDialog.close()
-class CustomProtocolThread(QtCore.QThread):
+class WaffleMillThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
+    global ui
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+        self.continuerun = True        
+        self.step = 0
+    def run(self):
+    # step == 0 --> writes patterns for trenches, notches and lamellae
+    # step == 1 --> mills trenches
+    # step == 2 --> mills notches
+    # step == 3 --> mills lamellae 
+        try:
+            #ui.write_patterns()
+            if step == 0:
+                print('Writing patterns for trenches, notches and lamellae')
+            elif step == 1:
+                print('Milling trenches')
+            elif step == 2:
+                print('Milling notches')
+            elif step == 3:
+                print('Milling lamellae')
+
+            row_count = ui.tableWidget.rowCount()
+            for i in range(row_count):
+                if self.continuerun:
+                    ui.log_out = ''
+                    lamella_positions = []
+                    if ui.tableWidget.item(i, 7) == None:
+                        print("Skipping Position " + str(ui.tableWidget.item(i, 0).text()))
+                    else:
+                        #write the patterns for the trenches
+                        label = ui.tableWidget.item(i, 0).text()
+                        x = float(ui.tableWidget.item(i, 1).text())
+                        y = float(ui.tableWidget.item(i, 2).text())
+                        z = float(ui.tableWidget.item(i, 3).text())
+                        r = float(ui.tableWidget.item(i, 4).text())
+                        t = float(ui.tableWidget.item(i, 5).text())
+                        ui.sysout.write('---------------------------------------------------\n')
+                        ui.sysout.write(str(label))
+                        ui.sysout.write('\n---------------------------------------------------\n')
+                        stagepos = {'label': label, 'x': x, 'y': y, 'z': z, 't': t, 'r': r}
+                        pattern_dir = ui.output_dir + '/' + str(label) + '/'
+                        pattern_type = self.check_trench_or_notch()
+                        image_number = int(ui.tableWidget.item(i, 6).text())
+                        patterns = self.pattern_dict[i]
+                        if 'trench' in pattern_type:
+                            protocolfile = ui.patternfile_trench
+                        elif 'notch' in pattern_type:
+                            protocolfile = ui.patternfile_notch
+                            image_number = 0  #img_id0 = template for a readily milled trench from the lamella milling angle     
+                        alignment_image = ui.ImageBufferImages[image_number]
+                        if step == 0:                            
+                            scope.write_patterns(label,patterns,alignment_image,output_dir)
+                            if position_type == 'notch':
+                                alignment_image = ui.ImageBufferImages[1]                             
+                                scope.write_patterns(label,patterns,alignment_image,output_dir)#img_id1 = template for a readily milled notch
+                        elif step == 1:
+                            if 'trench' in pattern_type:                                                    
+                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir, protocolfile)
+                        elif step == 2:
+                            if 'notch' in pattern_type:                                
+                                alignment_image = ui.ImageBufferImages[0]                                                       
+                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir, protocolfile)
+                        elif step == 3:
+                            if 'notch' in pattern_type:                                
+                                alignment_image = ui.ImageBufferImages[1]                                                       
+                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir, protocolfile)
+
+
+                        ui.log_out = ui.log_out + log_out_new
+                    ui.sysout.write(ui.log_out)
+            self.signal.emit("Custom Protocol done!")
+            ui.progressDialog.close()
+        except:
+            print("Something went wrong. Most likely, your output directory is not valid!")
+            print(sys.exc_info())
+            ui.progressDialog.close()
+    def check_trench_notch(self):
+        if 'trench' in label:
+            position_type = 'trench'
+        elif 'notch' in label:      
+            position_type = 'notch'
+        elif img_id % 2 == 1:
+            position_type = 'notch'
+        elif img_id % 2 == 0:         
+            position_type = 'trench'
+        return(position_type)
+    class CustomProtocolThread(QtCore.QThread):
+        signal = pyqtSignal('PyQt_PyObject')
     global ui
     def __init__(self):
         QtCore.QThread.__init__(self)
         self.continuerun = True
     def run(self):
         try:
-            ui.write_patterns()
+            ui.write_patterns() #write the top, center and bottom rectangles from alignment
             row_count = ui.tableWidget.rowCount()
             for i in range(row_count):
                 if self.continuerun:
