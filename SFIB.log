@@ -4632,3 +4632,1004 @@ Deviation (in meters): 0.0
 2022-09-22 11:33  : Move to Meteor carried out
 2022-09-22 11:34  : Calculated Move Position / mm: x: 43.619, y: -0.4089, z: 25.3582, t: 18.0, r: 9.98 -350.02
 2022-09-22 11:34  : Move to Meteor carried out
+2022-10-19 02:39  : Calculated Move Position / mm: x: 49.3904, y: 0.027, z: -0.0274, t: 0.0, r: 0.0 -360.0
+2022-10-19 02:39  : Move to Meteor carried out
+2022-10-19 02:46  : Saving Patterns ...
+2022-10-19 02:46  : No Position selected
+2022-10-19 02:46  : Ion beam blanked 
+2022-10-19 02:46  : Acquiring IB snapshot
+2022-10-19 02:46  : Ion beam blanked 
+2022-10-19 02:46  : Acquiring EB snapshot
+2022-10-19 02:46  : Saving Patterns ...
+2022-10-19 02:46  : Opening Image, No Patterns detected
+2022-10-19 02:46  : No Correlation spots detected
+2022-10-19 02:46  : Saving Patterns ...
+2022-10-19 02:46  : Opening Image, No Patterns detected
+2022-10-19 02:46  : No Correlation spots detected
+2022-10-19 02:46  : Position Added
+Backend Qt4Agg is interactive backend. Turning interactive mode on.
+2022-10-27 14:22  : Something went wrong, please let us know!
+2022-10-27 14:22  : (<class 'AttributeError'>, AttributeError("'NoneType' object has no attribute 'text'",), <traceback object at 0x0000021C96BD0408>)
+2022-10-27 14:22  : Something went wrong, please let us know!
+2022-10-27 14:22  : (<class 'AttributeError'>, AttributeError("'NoneType' object has no attribute 'text'",), <traceback object at 0x0000021C96BD0408>)
+2022-10-27 14:22  : Something went wrong, please let us know!
+2022-10-27 14:22  : (<class 'AttributeError'>, AttributeError("'NoneType' object has no attribute 'text'",), <traceback object at 0x0000021C96BD0408>)
+2022-10-27 14:22  : No Pattern selected.
+2022-10-27 14:22  : (<class 'AttributeError'>, AttributeError("'NoneType' object has no attribute 'text'",), <traceback object at 0x0000021C96BD0288>)
+2022-10-27 14:22  : No Pattern selected.
+2022-10-27 14:22  : (<class 'AttributeError'>, AttributeError("'NoneType' object has no attribute 'text'",), <traceback object at 0x0000021C96BD0288>)
+2022-10-28 15:01  : C:/Users/Johann/Documents/Repositories/SerialFIB/ScriptingExamples/FilesForWaffleDev/Alignment_image_notch_25degrees_new.tif
+2022-10-28 15:01  : No correlated image file detected or one of the files is corrupt.
+2022-10-28 15:01  : (<class 'FileNotFoundError'>, FileNotFoundError(2, 'No such file or directory'), <traceback object at 0x0000022E21A62788>)
+2022-10-28 15:02  : No correlated image file detected or one of the files is corrupt.
+2022-10-28 15:02  : (<class 'AttributeError'>, AttributeError("'str' object has no attribute 'read'",), <traceback object at 0x0000022E21A8ACC8>)
+2022-10-28 15:12  : C:/Users/Johann/Documents/Repositories/SerialFIB/ScriptingExamples/FilesForWaffleDev/Alignment_image_lamella.tif
+2022-10-28 15:12  : No correlated image file detected or one of the files is corrupt.
+2022-10-28 15:12  : (<class 'FileNotFoundError'>, FileNotFoundError(2, 'No such file or directory'), <traceback object at 0x0000022E21B1A748>)
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : Opening Image, No Patterns detected
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : Opening Image, No Patterns detected
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:14  : Saving Patterns ...
+2022-10-28 15:14  : ERROR
+2022-10-28 15:14  : No Correlation spots detected
+2022-10-28 15:37  : Saving Patterns ...
+2022-10-28 15:37  : ERROR
+2022-10-28 15:37  : No Correlation spots detected
+2022-10-28 15:57  : No Session File loaded
+2022-10-28 15:57  : No Session File loaded
+2022-10-28 15:57  : New session
+2022-10-28 15:57  : No Session File loaded
+2022-10-28 19:13  : Position Added
+2022-10-28 19:13  : Position Added
+2022-10-28 19:13  : Position Added
+2022-10-28 19:13  : Position Added
+2022-10-28 19:13  : Saving Patterns ...
+2022-10-28 19:13  : No Position selected
+2022-10-28 19:13  : Ion beam blanked 
+2022-10-28 19:13  : Acquiring IB snapshot
+2022-10-28 19:13  : Saving Patterns ...
+2022-10-28 19:13  : No Position selected
+2022-10-28 19:13  : Ion beam blanked 
+2022-10-28 19:13  : Acquiring IB snapshot
+2022-10-28 19:13  : Saving Patterns ...
+2022-10-28 19:13  : No Position selected
+2022-10-28 19:13  : Ion beam blanked 
+2022-10-28 19:13  : Acquiring IB snapshot
+2022-10-28 19:13  : Saving Patterns ...
+2022-10-28 19:13  : No Position selected
+2022-10-28 19:13  : Ion beam blanked 
+2022-10-28 19:13  : Acquiring IB snapshot
+2022-10-28 19:13  : Saving Patterns ...
+2022-10-28 19:13  : No Position selected
+2022-10-28 19:13  : Ion beam blanked 
+2022-10-28 19:13  : Acquiring IB snapshot
+2022-10-28 19:13  : Saving Patterns ...
+2022-10-28 19:13  : No Position selected
+2022-10-28 19:13  : Ion beam blanked 
+2022-10-28 19:13  : Acquiring IB snapshot
+2022-10-28 19:14  : No proper file selected.
+2022-10-28 19:14  : Something went wrong with the setup.
+2022-10-28 19:14  : (<class 'NameError'>, NameError("name 'wafflemill_thread' is not defined",), <traceback object at 0x000002DC874E92C8>)
+2022-10-28 19:15  : Something went wrong with the setup.
+2022-10-28 19:15  : (<class 'NameError'>, NameError("name 'wafflemill_thread' is not defined",), <traceback object at 0x000002DC801DFD48>)
+2022-10-28 19:17  : Position Added
+2022-10-28 19:17  : Position Added
+2022-10-28 19:17  : Position Added
+2022-10-28 19:17  : Position Added
+2022-10-28 19:17  : Saving Patterns ...
+2022-10-28 19:17  : No Position selected
+2022-10-28 19:17  : Ion beam blanked 
+2022-10-28 19:17  : Acquiring IB snapshot
+2022-10-28 19:17  : Saving Patterns ...
+2022-10-28 19:17  : No Position selected
+2022-10-28 19:17  : Ion beam blanked 
+2022-10-28 19:17  : Acquiring IB snapshot
+2022-10-28 19:17  : Saving Patterns ...
+2022-10-28 19:17  : No Position selected
+2022-10-28 19:17  : Ion beam blanked 
+2022-10-28 19:17  : Acquiring IB snapshot
+2022-10-28 19:17  : Saving Patterns ...
+2022-10-28 19:17  : No Position selected
+2022-10-28 19:17  : Ion beam blanked 
+2022-10-28 19:17  : Acquiring IB snapshot
+2022-10-28 19:17  : Saving Patterns ...
+2022-10-28 19:17  : No Position selected
+2022-10-28 19:17  : Ion beam blanked 
+2022-10-28 19:17  : Acquiring IB snapshot
+2022-10-28 19:17  : Saving Patterns ...
+2022-10-28 19:17  : No Position selected
+2022-10-28 19:17  : Ion beam blanked 
+2022-10-28 19:17  : Acquiring IB snapshot
+2022-10-28 19:18  : Something went wrong with the setup.
+2022-10-28 19:18  : (<class 'UnboundLocalError'>, UnboundLocalError("local variable 'WaffleMillThread' referenced before assignment",), <traceback object at 0x000001CA28D05248>)
+2022-11-23 00:19  : Ion beam blanked 
+2022-11-23 00:19  : Acquiring EB snapshot
+2022-11-23 00:19  : Ion beam blanked 
+2022-11-23 00:19  : Acquiring EB snapshot
+2022-11-23 00:19  : Ion beam blanked 
+2022-11-23 00:19  : Acquiring EB snapshot
+2022-11-23 00:19  : Ion beam blanked 
+2022-11-23 00:19  : Acquiring EB snapshot
+2022-11-23 00:19  : Ion beam blanked 
+2022-11-23 00:19  : Acquiring EB snapshot
+2022-11-23 00:19  : The rotation center was determined at: -4.046774849107873e-15, -2.277768617187655e-15
+2022-11-23 00:38  : Ion beam blanked 
+2022-11-23 00:38  : Acquiring EB snapshot
+2022-11-23 00:38  : Ion beam blanked 
+2022-11-23 00:38  : Acquiring EB snapshot
+2022-11-23 00:38  : Ion beam blanked 
+2022-11-23 00:38  : Acquiring EB snapshot
+2022-11-23 00:38  : Ion beam blanked 
+2022-11-23 00:38  : Acquiring EB snapshot
+2022-11-23 00:38  : Ion beam blanked 
+2022-11-23 00:38  : Acquiring EB snapshot
+2022-11-23 00:38  : Ion beam blanked 
+2022-11-23 00:38  : Acquiring EB snapshot
+2022-11-23 00:38  : Ion beam blanked 
+2022-11-23 00:38  : Acquiring EB snapshot
+2022-11-23 00:38  : The rotation center was determined at: -9.211132489678715e-16, -4.494712830180304e-16
+2022-11-23 00:38  : Calculated Move Position / mm: x: -49.3904, y: -0.027, z: 0.0274, t: 0.0, r: 0.0 -360.0
+2022-11-23 00:38  : Move to Meteor carried out
+2022-11-23 00:39  : Calculated Move Position / mm: x: 49.3904, y: 0.027, z: -0.0274, t: 0.0, r: 0.0 -360.0
+2022-11-23 00:39  : Move to Meteor carried out
+2022-11-23 00:39  : Calculated Move Position / mm: x: -49.3904, y: -0.027, z: 0.0274, t: 0.0, r: 0.0 -360.0
+2022-11-23 00:39  : Move to Meteor carried out
+2022-11-23 01:56  : Moving to METEOR...
+2022-11-23 01:56  : Returning from METEOR...
+2022-11-23 01:57  : Running rotation center calibration procedure
+2022-11-23 01:57  : Ion beam blanked 
+2022-11-23 01:57  : Acquiring EB snapshot
+2022-11-23 01:57  : Ion beam blanked 
+2022-11-23 01:57  : Acquiring EB snapshot
+2022-11-23 01:57  : Ion beam blanked 
+2022-11-23 01:57  : Acquiring EB snapshot
+2022-11-23 01:57  : Ion beam blanked 
+2022-11-23 01:57  : Acquiring EB snapshot
+2022-11-23 01:57  : Ion beam blanked 
+2022-11-23 01:57  : Acquiring EB snapshot
+2022-11-23 01:57  : Ion beam blanked 
+2022-11-23 01:57  : Acquiring EB snapshot
+2022-11-23 01:58  : Ion beam blanked 
+2022-11-23 01:58  : Acquiring EB snapshot
+2022-11-23 01:58  : The rotation center was determined at: -1.6813325396421157e-16, 1.6230672300951268e-16 mm
+2022-11-23 01:58  : Position Added
+2022-11-23 01:59  : Moving to Stage Position: 0
+2022-11-23 01:59  : Running rotation center calibration procedure
+2022-11-23 01:59  : Ion beam blanked 
+2022-11-23 01:59  : Acquiring EB snapshot
+2022-11-23 01:59  : Ion beam blanked 
+2022-11-23 01:59  : Acquiring EB snapshot
+2022-11-23 01:59  : Ion beam blanked 
+2022-11-23 01:59  : Acquiring EB snapshot
+2022-11-23 01:59  : Ion beam blanked 
+2022-11-23 01:59  : Acquiring EB snapshot
+2022-11-23 02:00  : Ion beam blanked 
+2022-11-23 02:00  : Acquiring EB snapshot
+2022-11-23 02:00  : Ion beam blanked 
+2022-11-23 02:00  : Acquiring EB snapshot
+2022-11-23 02:00  : Ion beam blanked 
+2022-11-23 02:00  : Acquiring EB snapshot
+2022-11-23 02:00  : The rotation center was determined at: -1.116350572360437e-16, 3.890570243066857e-16 mm
+2022-11-23 03:59  : Incorrect file selected
+2022-11-23 03:59  : (<class 'ValueError'>, ValueError('Plugin tiffile not found.',), <traceback object at 0x000001E5190EBAC8>)
+2022-11-23 04:07  : Incorrect file selected
+2022-11-23 04:07  : (<class 'ValueError'>, ValueError('Plugin tiffile not found.',), <traceback object at 0x000001D6DAB69908>)
+2022-11-23 15:31  : Incorrect file selected
+2022-11-23 15:31  : (<class 'ValueError'>, ValueError('Plugin tiffile not found.',), <traceback object at 0x000001D75F21BF08>)
+2022-11-23 15:32  : Saving Patterns ...
+2022-11-23 15:32  : No Position selected
+2022-11-23 15:32  : Patterns copied
+2022-11-23 15:32  : Saving Patterns ...
+2022-11-23 15:32  : ERROR
+2022-11-23 15:32  : No Correlation spots detected
+2022-11-23 15:32  : Saving Patterns ...
+2022-11-23 15:32  : No Position selected
+2022-11-23 15:32  : Patterns copied
+2022-11-23 15:32  : Saving Patterns ...
+2022-11-23 15:32  : ERROR
+2022-11-23 15:32  : No Correlation spots detected
+2022-11-23 15:33  : Incorrect file selected
+2022-11-23 15:33  : (<class 'ValueError'>, ValueError('Plugin tiffile not found.',), <traceback object at 0x000002110ED1DF48>)
+2022-11-23 15:34  : Please select an 8-bit 2D image
+2022-11-23 15:34  : Incorrect file selected
+2022-11-23 15:34  : (<class 'UnboundLocalError'>, UnboundLocalError("local variable 'array' referenced before assignment",), <traceback object at 0x0000020C383C7F08>)
+2022-11-23 15:37  : Please select an 8-bit 2D image
+2022-11-23 15:37  : Incorrect file selected
+2022-11-23 15:37  : (<class 'UnboundLocalError'>, UnboundLocalError("local variable 'array' referenced before assignment",), <traceback object at 0x00000233D8DB3188>)
+2022-11-23 15:41  : Incorrect file selected
+2022-11-23 15:41  : (<class 'TypeError'>, TypeError("'tuple' object is not callable",), <traceback object at 0x000001BB98DC7A08>)
+2022-11-23 15:42  : (1040, 1388, 5)
+2022-11-23 15:42  : Please select an 8-bit 2D image
+2022-11-23 15:42  : Incorrect file selected
+2022-11-23 15:42  : (<class 'UnboundLocalError'>, UnboundLocalError("local variable 'array' referenced before assignment",), <traceback object at 0x00000287D4766A88>)
+2022-11-23 15:47  : (1040, 1388, 5)
+2022-11-23 15:47  : Incorrect file selected
+2022-11-23 15:47  : (<class 'AttributeError'>, AttributeError("'QSlider' object has no attribute 'setMaxium'",), <traceback object at 0x000001DA2A8A5A08>)
+2022-11-23 15:48  : (1040, 1388, 5)
+2022-11-23 15:48  : Incorrect file selected
+2022-11-23 15:48  : (<class 'TypeError'>, TypeError("arguments did not match any overloaded call:\n  QImage(): too many arguments\n  QImage(QSize, QImage.Format): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(int, int, QImage.Format): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(bytes, int, int, QImage.Format): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(sip.voidptr, int, int, QImage.Format): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(bytes, int, int, int, QImage.Format): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(sip.voidptr, int, int, int, QImage.Format): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(List[str]): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(str, format: str = None): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(QImage): argument 1 has unexpected type 'numpy.ndarray'\n  QImage(Any): too many arguments",), <traceback object at 0x00000240271DA148>)
+2022-11-23 16:01  : (1040, 1388, 5)
+2022-11-23 16:01  : Incorrect file selected
+2022-11-23 16:01  : (<class 'TypeError'>, TypeError('src is not a numpy array, neither a scalar',), <traceback object at 0x0000018F632E5A88>)
+2022-11-23 17:16  : (1040, 1388, 5)
+2022-11-23 17:16  : Incorrect file selected
+2022-11-23 17:16  : (<class 'AttributeError'>, AttributeError("'QListWidget' object has no attribute 'setcurrentItem'",), <traceback object at 0x000002000E128A48>)
+2022-11-23 20:28  : (18, 2048, 2048, 3)
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:28  : Multichannel image selected
+2022-11-23 20:35  : (18, 2048, 2048, 3)
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:35  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:36  : Multichannel image selected
+2022-11-23 20:57  : (18, 2048, 2048, 3)
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:57  : Multichannel image selected
+2022-11-23 20:59  : (18, 2048, 2048, 3)
+2022-11-23 20:59  : Multichannel image selected
+2022-11-23 20:59  : Incorrect file selected
+2022-11-23 20:59  : (<class 'AttributeError'>, AttributeError("'numpy.ndarray' object has no attribute 'moveaxis'",), <traceback object at 0x0000018B754A9C08>)
+2022-11-23 21:00  : (18, 2048, 2048, 3)
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:00  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:01  : Multichannel image selected
+2022-11-23 21:05  : (18, 2048, 2048, 3)
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:05  : Multichannel image selected
+2022-11-23 21:15  : (18, 2048, 2048, 3)
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:15  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:16  : Multichannel image selected
+2022-11-23 21:17  : (18, 2048, 2048, 3)
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:17  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:18  : Multichannel image selected
+2022-11-23 21:19  : (18, 2048, 2048, 3)
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:19  : Multichannel image selected
+2022-11-23 21:33  : (18, 2048, 2048, 3)
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:33  : Multichannel image selected
+2022-11-23 21:45  : (18, 2048, 2048, 3)
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:45  : Multichannel image selected
+2022-11-23 21:46  : Saving Patterns ...
+2022-11-23 21:46  : No Position selected
+2022-11-23 21:46  : Ion beam blanked 
+2022-11-23 21:46  : Acquiring IB snapshot
+2022-11-23 21:46  : Saving Patterns ...
+2022-11-23 21:46  : Saving Patterns ...
+2022-11-23 21:46  : <PyQt5.QtWidgets.QListWidgetItem object at 0x0000028AB351EB88>
+2022-11-23 21:46  : Opening Image, No Patterns detected
+2022-11-23 21:46  : No Correlation spots detected
+2022-11-23 21:46  : Saving Patterns ...
+2022-11-23 21:46  : Saving Patterns ...
+2022-11-23 21:46  : <PyQt5.QtWidgets.QListWidgetItem object at 0x0000028AB351EB88>
+2022-11-23 21:46  : Opening Image, No Patterns detected
+2022-11-23 21:46  : ERROR
+2022-11-23 21:46  : No Correlation spots detected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:46  : Multichannel image selected
+2022-11-23 21:53  : (18, 2048, 2048, 3)
+2022-11-23 21:53  : Incorrect file selected
+2022-11-23 21:53  : (<class 'ValueError'>, ValueError('not enough values to unpack (expected 2, got 1)',), <traceback object at 0x000002342E2F9EC8>)
