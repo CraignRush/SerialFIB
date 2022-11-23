@@ -5633,3 +5633,4 @@ Backend Qt4Agg is interactive backend. Turning interactive mode on.
 2022-11-23 21:53  : (18, 2048, 2048, 3)
 2022-11-23 21:53  : Incorrect file selected
 2022-11-23 21:53  : (<class 'ValueError'>, ValueError('not enough values to unpack (expected 2, got 1)',), <traceback object at 0x000002342E2F9EC8>)
+2022-11-23 23:48  : (1040, 1388, 5)
