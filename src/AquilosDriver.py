@@ -42,6 +42,7 @@ from src.custom_matchers_v3 import *
 
 from src.custom_matchers_v2 import *
 from src.read_SAV import read_SAV_params
+from src.centroidCalibration import *
 import cv2
 import numpy as np
 import time
@@ -50,6 +51,9 @@ import os
 import datetime
 import sys
 import math
+from scipy import optimize
+from itertools import compress
+import matplotlib.pyplot as plt
 
 try:
     microscope.connect()
@@ -82,6 +86,10 @@ class fibsem:
         self.trench_offset = 4e-06
         # Variable for stopping operation
         self.continuerun = True
+
+        self.stageRotCenter = (0.,0.)
+        self.FIB_position = {}
+        self.METEOR_position = {}
 
     def define_output_dir(self,directory):
         '''
@@ -272,6 +280,28 @@ class fibsem:
         #### Microscope independent code####
         stage_dict={'x':float(x),'y':float(y),'z':float(z),'r':float(r),'t':float(t)}
         return(stage_dict)
+    
+    def moveStageRelative(self,stageposition, compucentric = False):
+        '''
+        Input: Change in stage position as directory
+        Output: None
+        Action: Move stage relative to previous position by given parameters
+        '''
+        ### Microscope Independet Code ###
+        x=float(stageposition['x'])
+        y=float(stageposition['y'])
+        z=float(stageposition['z'])
+        r=float(stageposition['r'])
+        t=float(stageposition['t'])
+
+        if compucentric == True:
+            if self.getStagePosition()['r'] - r > 1.0:
+                x,y = rotate_point_around_center(self.stageRotCenter, (x,y), r)
+
+        ### Microscope Dependent Code ###
+        stagepos=StagePosition(x=x,y=y,z=z,t=t,r=r)
+        microscope.specimen.stage.relative_move(stagepos)
+        return("Stage Moved")
 
     def moveStageAbsolute(self, stageposition):
         '''
@@ -292,29 +322,46 @@ class fibsem:
         stagepos=StagePosition(x=x,y=y,z=z,t=t,r=r)
         microscope.specimen.stage.absolute_move(stagepos)
         return()
-    def moveStageRelative(self,stageposition):
+    
+
+    def moveStageAbsoluteRobust(self,stageposition):
         '''
         Input: Change in stage position as directory
         Output: None
         Action: Move stage relative to previous position by given parameters
         '''
-        ### Microscope Independet Code ###
         x=float(stageposition['x'])
         y=float(stageposition['y'])
         z=float(stageposition['z'])
         r=float(stageposition['r'])
         t=float(stageposition['t'])
+        
+        newPos = self.getStagePosition()            
+        pos = {'x':x,'y':y,'z':z,'r':r,'t':t}
 
-        ### Microscope Dependent Code ###
-        stagepos=StagePosition(x=x,y=y,z=z,t=t,r=r)
-        microscope.specimen.stage.relative_move(stagepos)
+        iterations = 0
+        while round(r,3) != round(newPos['r'],3) and iterations < 5:
+            pos['r'] = r + math.radians(3.0)    
+            self.moveStageAbsolute(pos) 
+            time.sleep(1)   
+            pos['r'] = r  
+            self.moveStageAbsolute(pos)
+            time.sleep(1)   
+            newPos = self.getStagePosition()
+            iterations += 1
+
         return("Stage Moved")
+    
+
+
+
     def align(self,image,beam,current=1.0e-11, NO_BEAMSHIFT = False):
         '''
         Input: Alignment image, Beam ("ION" or "ELECTRON"), optionally current but replaced by the GUI option
         Output: None
         Action: Align the stage and beam shift to the reference image at the current stage position
         '''
+        
         current=self.alignment_current
 
 
@@ -590,115 +637,105 @@ class fibsem:
 
         return()
 
-    def findRotationCenter(self, deltaR_deg: float = 2.5, iterations: int = 10, current=13e-12):
-        # Tries to align to a position on the grid after a small rotation
+    def move_to_METEOR(self, origin):
+        '''
+        Saves a position in self.FIB_position and drive to the METEOR position.
+        TODO: Specify meteor focal point in config file.
+        '''
+        print("Moving to METEOR...")
+        # Save position in member variable        
+        origin = self.getStagePosition() 
+        self.FIB_position = origin
 
-        # Init running variables
-        deltaR = deltaR_deg * math.pi / 180
-        itrations = 10
-        rotation_center = (.0,.0)  
-        pos_rotation = []
-        pos_rotation_aligned = []   
-        pos_estimated = []     
+        # Rotate around 180° and tilt around -14°
+        rel_move={'x':0, 'y':0,'z':0,'r':3.14159,'t':-0.244346}
+        self.moveStageRelative(rel_move, compucentric = True)
 
-        # Initializing imaging mode
-        self.set_HFW("ELECTRON", 3e-3)
-        img_resolution = '1536x1024'        
-        microscope.beams.electron_beam.scanning.resolution.value = img_resolution
-        microscope.beams.electron_beam.beam_shift.value = Point(0, 0)
+        # Transform coordinates to the meteor position
+        position = self.getStagePosition()
+        position['x'] = 49.3904e-3 + position['x']
+        position['y'] = (4.185e-3 - (position['z'] - position['y'])) / 2.036
+        position['z'] = -1.036 * position['y'] + 4.185e-3
+        self.moveStageAbsoluteRobust(position)
 
-        # Init matcher
-        favourite_matcher = CustomCVMatcher('phase')
+        if [position['x'],position['y']] == ['0','0']:
+            print("ERROR: Invalid Stage Position") 
 
-        img_reference = self.take_image_EB()
-        pos_alignment = self.getStagePosition()
+        return position
+    
+    
+    def move_from_METEOR(self):        
+        print("Returning from METEOR...")
+        self.METEOR_position = self.getStagePosition()
+        self.moveStageAbsoluteRobust(self.FIB_position)
 
-        for i in range(itrations):
-            # Calculate new angle
-            angle = (i+1) * deltaR
-
-            # Estimate coordinates of rotated point with estimated center of rotation
-            pos_estimated_vector = self.get_rotation_matrix_offset(angle,rotation_center) *\
-                np.array([pos_alignment['x'], pos_alignment['y'],1])
-            pos_estimated.append(pos_alignment)
-            pos_estimated[i]['x'] = pos_estimated_vector[0]
-            pos_estimated[i]['y'] = pos_estimated_vector[1]
-            pos_estimated[i]['r'] =  pos_alignment['r'] - angle
-
-            #Execute stage move
-            self.moveStageAbsolute(pos_estimated[i])
-
-            #Take alignment image and save position
-            img_rotated = self.take_image_EB()
-
-            #Align images and save the offset
-            l = vision_toolkit.locate_feature(img_reference, img_rotated, favourite_matcher)
-            print("Current confidence: " + str(l.confidence))
-            move_count = 0
-
-            # Try to reduce offset as much as possible in three x-y-moves
-            while l.confidence < 0.98 and move_count < 3:
-                x = l.center_in_meters.x * -1  # sign may need to be flipped depending on matcher
-                y = l.center_in_meters.y * -1
-                distance = np.sqrt(x ** 2 + y ** 2)
-                print("Deviation (in meters): " + str(distance))
-                if distance > 1e-05:
-                    # move stage and reset beam shift
-                    print("Moving stage by ("+str(x)+","+str(y)+") and resetting beam shift...")
-                    #self.log_output = self.log_output + "Moving stage by ("+str(x)+","+str(y)+") and resetting beam shift... \n"
-
-                    rotation = microscope.beams.electron_beam.scanning.rotation.value
-                    possible_rotations = [0, 3.14]
-                    num=min(possible_rotations, key=lambda x: abs(x - rotation))
-                    print(num)
-                    if num==0:
-                        pos_corr = StagePosition(coordinate_system='Specimen', x=-x, y=-y)
-                    if num==3.14:
-                        pos_corr = StagePosition(coordinate_system='Specimen', x=x, y=y)
-                    microscope.specimen.stage.relative_move(pos_corr)
-                    microscope.beams.electron_beam.beam_shift.value = Point(0,0)
-
-                move_count += 1
-                img_rotated = self.take_image_EB()
-                l = vision_toolkit.locate_feature(img_reference, img_rotated, favourite_matcher)
-
-            pos_rotation_aligned.append(self.getStagePosition())
-
-            # Calculate the difference between the rotated and aligned position
-            rotation_difference = {key: pos_rotation_aligned[key] - pos_rotation.get(key, 0) for key in pos_rotation_aligned}
-            rotation_difference_vector = np.array(rotation_difference['x'], rotation_difference['y'])
-
-            rotation_center_new = self.get_rotation_matrix_inverse(angle) * rotation_difference_vector
-            
-            rotation_center = rotation_center + (rotation_center - rotation_center_new) * 0.75
-
-
-            
-        microscope.beams.electron_beam.scanning.resolution.value = old_resolution
-        microscope.beams.electron_beam.horizontal_field_width.value = old_mag
         return()
 
-    def get_rotation_matrix_inverse(self,angle: float):
-        '''
-        Input: Delta Rotation of the the stage in radians\n
-        Output: Matrix of the shape:\n
-        (2 - 2*cos(phi)) ** (-1) *  [ 1-cos(phi) , -sin(phi) ; sin(phi) , 1-cos(phi) ]
-        '''
-        c,s = np.cos(angle), np.sin(angle)
-        determinant = (2 - 2 * c) ** -1
-        matrix = np.matrix([[1-c, -s], [s, 1-c]])
-        return(determinant * matrix)
 
-    def get_rotation_matrix_offset(self,angle, origin = (0,0)):
+    def find_rotation_center(self, deltaR_deg: float = 20.0, iterations: int = 6, HFW: float = 300e-6, current=13e-12):
         '''
-        Input: Delta Rotation of the the stage in radians, Tuple of rotation center\n
-        Output: npmy rotation Matrix 3x3
+        Tries to align to a position on the grid after a small rotation
         '''
-        c,s = np.cos(angle), np.sin(angle)
-        x,y = origin[0], origin[1]
-        matrix = np.array([[c, -s, x - c*x + s*y],[s , c,  y - s*x - c*y],[0,0,1]])
+        print("Running rotation center calibration procedure")
+        # Init running variables
+        deltaR = np.deg2rad(deltaR_deg)
+        rot_center = self.stageRotCenter
 
+        # Initializing imaging mode
+        self.set_HFW("ELECTRON", HFW)
+        img_resolution = '1536x1024'     
+        pixel_size = HFW/1536
 
+        microscope.beams.electron_beam.scanning.resolution.value = img_resolution
+        microscope.beams.electron_beam.beam_shift.value = Point(0, 0)
+        microscope.beams.electron_beam.beam_current.value = current
+
+        reference = {}
+        reference['img'] = self.take_image_EB()
+        reference['pos'] = self.getStagePosition()
+        reference['angle'] = reference['pos']['r']
+
+        pos_fit = []
+        pos_fit.append(reference['pos'])
+
+        ## TODO Add a finer HFW for calibration
+
+        for i in range(iterations):
+            # Calculate new angle
+            new_angle = (i+1) * deltaR + reference['angle'] #* (-1)**i 
+
+            '''See if this works
+            print("Performing compucentric rotation by 45 degrees clockwise...")
+            s = MoveSettings(rotate_compucentric=True)
+            p = StagePosition(r=0.785)
+            microscope.specimen.stage.relative_move(p, s)
+            print("Done")
+            '''
+
+            #Execute stage move
+            pos_alignment = reference['pos']
+            pos_alignment['r'] = new_angle
+            if rot_center is not (0.,0.):
+                pos_alignment['x'], pos_alignment['y'] = rotate_point_around_center(rot_center, (pos_alignment['x'], pos_alignment['y']), new_angle)
+
+            self.moveStageAbsoluteRobust(pos_alignment)
+            img_alignment = self.take_image_EB()
+            # Track features
+            matrix = matchFeatures(img_alignment.data, reference['img'].data)[1]
+            transf_params = get_params_from_transformation_matrix(matrix, pixel_size)
+
+            pos_alignment['x'] -=  transf_params['t_meter'][0]
+            pos_alignment['y'] -=  transf_params['t_meter'][1]
+            # Adjust position
+            pos_fit.append(pos_alignment)
+
+        x,y = [_['x'] for _ in pos_fit], [_['y'] for _ in pos_fit]
+        circle_center = calculate_center_lsq(x,y)
+        self.stageRotCenter = (circle_center['xc'], circle_center['yc'])
+        print("The rotation center was determined at: {}, {} mm".format(circle_center['xc']*1e3,circle_center['yc']*1e3))
+
+        return()
+       
 
     def align_current(self,new_current,beam='ION'):
         '''
@@ -1031,7 +1068,7 @@ class fibsem:
 
         self.run_milling(patterns_output_directory, pattern_left_name, pattern_right_name,milling_time=60)
 
-        current_img=scope.take_image_IB()
+        current_img=self.take_image_IB()
         current_img.save(patterns_output_directory[:-1] + '/after_trenches.tif')
         return(self.log_output)
 
@@ -1294,12 +1331,12 @@ class fibsem:
                         y = -w / 2 - (py - image_shape[0] / 2)
 
                         try:
-                            pattern = scope.create_pattern(x * pixel_size, y * pixel_size, w * pixel_size,
+                            pattern = self.create_pattern(x * pixel_size, y * pixel_size, w * pixel_size,
                                                            h * pixel_size)
-                            scope.save_pattern(lamella_dir, pattern_filename, pattern)
+                            self.save_pattern(lamella_dir, pattern_filename, pattern)
                         except:
                             pattern = Pattern(0, 0, 0, 0, 0, 'UP')
-                            scope.save_pattern(lamella_dir, pattern_filename, pattern)
+                            self.save_pattern(lamella_dir, pattern_filename, pattern)
                             print("Error in Pattern Writing: No Microscope connected?")
                 except KeyError:
                     print('No Patterns were found')
@@ -1527,11 +1564,11 @@ class fibsem:
                     self.align_current(new_current=float(steps_current[i]), beam='ION')
                 if (i+1) % int(params['FocusEvery']) == 0:
                     #microscope.imaging.set_active_view(1)
-                    scope.auto_focus(beam="ELECTRON")
+                    self.auto_focus(beam="ELECTRON")
                 if i==0:
                     if int(params['FocusInitial']) == 1:
                     #microscope.imaging.set_active_view(1)
-                        scope.auto_focus(beam="ELECTRON")
+                        self.auto_focus(beam="ELECTRON")
                 if (i+1) % int(params['RealignEvery']) == 0:
                     self.align(ref_img,'ION',current=float(steps_current[i]))
                     #self.align_current(new_current=float(steps_current[i]), beam='ION')
