@@ -1,0 +1,3 @@
+[submodule "iFLM_integratedLightModule"]
+	path = iFLM_integratedLightModule
+	url = https://github.com/CraignRush/iFLM_integratedLightModule
