@@ -5634,3 +5634,16 @@ Backend Qt4Agg is interactive backend. Turning interactive mode on.
 2022-11-23 21:53  : Incorrect file selected
 2022-11-23 21:53  : (<class 'ValueError'>, ValueError('not enough values to unpack (expected 2, got 1)',), <traceback object at 0x000002342E2F9EC8>)
 2022-11-23 23:48  : (1040, 1388, 5)
+2022-11-24 00:08  : (16, 512, 512, 3)
+2022-11-24 00:09  : (15, 182, 400, 4)
+2022-11-24 00:09  : Saving Patterns ...
+2022-11-24 00:09  : No Position selected
+2022-11-24 00:09  : Ion beam blanked 
+2022-11-24 00:09  : Acquiring IB snapshot
+2022-11-24 00:09  : Saving Patterns ...
+2022-11-24 00:09  : Opening Image, No Patterns detected
+2022-11-24 00:09  : No Correlation spots detected
+2022-11-24 00:09  : Saving Patterns ...
+2022-11-24 00:09  : Opening Image, No Patterns detected
+2022-11-24 00:09  : ERROR
+2022-11-24 00:09  : No Correlation spots detected
