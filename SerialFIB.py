@@ -38,7 +38,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #               Function Import             #
 #############################################
 #### IMPORT AUTOSCRIPT STRUCTURES
-from autoscript_sdb_microscope_client.structures import *
+try:
+    from autoscript_sdb_microscope_client.structures import *
+except:
+    print("No Autoscript installed")
+
 ### IMPROT DRIVERS AND TOOLS
 from src.AquilosDriver import fibsem
 from src.scripteditor import Ui_ScriptEditor
@@ -112,7 +116,10 @@ class Ui_MainWindow(object):
         import os
         path = r'%s' % os.getcwd().replace('\\', '/')
         self.output_dir=path
-        scope.define_output_dir(self.output_dir)
+        try:
+            scope.define_output_dir(self.output_dir)
+        except:
+            print("No Microscope connected")
         self.SAVparamsfile=r'./SAVparams.spf'
         self.roughmillprotocol=r'./roughmill.pro'
         self.finemillprotocol=r'./finemill.pro'

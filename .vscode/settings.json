@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "C:\\Program Files\\Python35\\envs\\AutoScript\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "jupyter.logging.level": "verbose",
+    "jupyter.enablePythonKernelLogging": true,
+   // "python.languageServer": "Pylance"
+}

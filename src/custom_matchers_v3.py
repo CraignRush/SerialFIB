@@ -247,3 +247,5 @@ if __name__ == "__main__":
     # print('Correlating by phase correlation')
     # match_center_x, match_center_y, match_score = phase_correlate(image,template)
     # print(match_center_x, match_center_y, match_score)
+
+
