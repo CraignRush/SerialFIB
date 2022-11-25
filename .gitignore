@@ -13,3 +13,5 @@ src/Zeiss/OldFiles
 src/Zeiss/Workfiles
 src/Zeiss/.ipynb_checkpoints
 
+.DS_Store
+
