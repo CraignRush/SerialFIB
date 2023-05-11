@@ -1,0 +1,40 @@
+@startuml
+
+
+node "LAN-Network" {
+  component MicroscopePC [
+  MicroscopePC  
+  'Windows
+  'Python 3.6
+]
+
+component MeteorPC [
+  MeteorPC  
+  'Ubuntu
+  'Python 3.8
+]
+  package "TFS Scios" {    
+    [METEOR] -up- xTServer
+    [FIBSEM] -up-> xTServer  
+    component DriverPC [
+      DriverPC  
+      'Windows
+      'Python 3.6
+    ]
+    DriverPC <-up- xTServer
+  }
+AutoScript4  <-up- DriverPC
+
+MicroscopePC <-up- AutoScript4
+MeteorPC -up- AutoScript4 : customAPI 
+MeteorPC -up-> [METEOR] : customAPI  
+
+MicroscopePC .[#red]> [MeteorPC] : <color:red>manual\n<color:red> via VNC
+}
+
+cloud "SerialFIB"{
+    LamellaPrep -- AutoScript4
+}
+
+
+@enduml

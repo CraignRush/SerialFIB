@@ -1,0 +1,8 @@
+auto_mix_prep==0.2.0
+matplotlib==3.5.1
+numpy==1.22.3
+opencv_python==4.5.5.62
+PyAutoGUI==0.9.53
+scipy==1.7.3
+tifffile==2021.11.2
+tqdm==4.63.0

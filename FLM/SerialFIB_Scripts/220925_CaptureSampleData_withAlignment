@@ -1,0 +1,214 @@
+import math, pathlib, cv2, datetime
+from time import sleep
+import numpy as np
+import csv
+
+
+
+
+def robust_rotation(angle, VERBOSE=False):    
+    newPos = fibsem.getStagePosition()
+    newPos['r'] = angle  
+    fibsem.moveStageAbsolute(newPos)
+    while round(angle,3) != round(newPos['r'],3):
+        if VERBOSE:
+            print(round(angle,3))
+            print(round(newPos['r'],3))
+            print(np.rad2deg(newPos['r']))
+
+        newPos['r'] = angle + np.deg2rad(2)   
+        fibsem.moveStageAbsolute(newPos) 
+        sleep(0.5)   
+        newPos['r'] = angle  
+        fibsem.moveStageAbsolute(newPos)
+        sleep(0.5)   
+        newPos = fibsem.getStagePosition()
+
+
+
+
+
+def get_params_from_transformation_matrix(m, pixe_size=0.0, PRINT=False):
+    if np.abs(m[2,0]) > 1e-3 or np.abs(m[2,1]) > 1e-3 :
+        print("This is no valid transformation matrix, the projection component is too large.")
+        return None
+    else:
+        a,b,c,d = m[0,0] , m[0,1], m[1,0], m[1,1]
+        result = {}
+        result['transl'] = [m[0,2], m[1,2]]
+        sx, sy = np.sqrt(a ** 2 + c ** 2) , np.sqrt(b ** 2 + d ** 2)
+        result['scale']  = [sx, sy]
+        phi1,phi2 = np.rad2deg(np.arctan((c/sx)/(d/sy))), np.rad2deg(np.arctan((-b/sy)/(a/sx)))
+        result['phi']  = [phi1,phi2, np.mean([phi1,phi2])]
+        result['t_meter'] =[ t * pixel_size for t in result['transl']]           
+
+        if PRINT:                        
+            print("---Image Transformation---")
+            print("{}\n".format(m))
+            if pixel_size > 0.0:         
+                print("Translation (x,y) / mm: {:.2f}, {:.2f}".format(m[0,2]*1e3*pixel_size,m[1,2]*1e3*pixel_size))
+            print("Translation (x,y) / px: {}, {}".format(m[0,2],m[1,2]))
+            print("Scaling (x,y): {}, {}".format(result['s'][0], result['s'][1]))
+            print("Rotation Angle (x,y, mean): {}, {}, {}".format(phi1,phi2 ,round(result['phi'][2],2)))            
+            #print("Center of rotation / mm: {}, {}".format(solution[x]*1e3, solution[y]*1e3))
+        return result
+
+
+
+
+def matchFeatures(img_to_align, img_reference, MIN_MATCHES=50, N_FEATURES=2000, DISPLAY_MATCHES=False):
+    orb = cv2.ORB_create(nfeatures=2000)
+    kp1, des1 = orb.detectAndCompute(img_to_align, None)
+    kp2, des2 = orb.detectAndCompute(img_reference, None)
+
+    index_params = dict(algorithm=6,
+                        table_number=6,
+                        key_size=12,
+                        multi_probe_level=2)
+    search_params = {}
+    flann = cv2.FlannBasedMatcher(index_params, search_params)
+    matches = flann.knnMatch(des1, des2, k=2)
+
+    # As per Lowe's ratio test to filter good matches
+    good_matches = []
+    for m, n in matches:
+        if m.distance < 0.75 * n.distance:
+            good_matches.append(m)
+
+    if len(good_matches) > MIN_MATCHES:
+        src_points = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        dst_points = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        mat, mask = cv2.findHomography(src_points, dst_points, cv2.RANSAC, 5.0)
+        corrected_img = cv2.warpPerspective(img_to_align, mat, (img_reference.shape[1], img_reference.shape[0]))
+        if DISPLAY_MATCHES:            
+            match_img = cv2.drawMatches(img_to_align, kp1, img_reference, kp2, good_matches[:50], None)
+            f, ax = plt.subplots()
+            ax.imshow(match_img)
+            plt.show()
+
+
+
+
+        return corrected_img, mat.copy()
+    else:
+        print('Matching failed')
+        return None, None
+
+
+
+
+
+deltaR_deg = 1.0
+itrations = 360
+output_dir=r'D:/SharedData/Johann/220926_SampleDataRotation/' + datetime.datetime.now().strftime(r'%y%m%d_%H%M%S_') + str(deltaR_deg) + 'deg_'+ str(itrations) +'_MovementTestAligned/'
+# Define Start position
+pos = fibsem.getStagePosition()
+pos['x'] = 2.0254e-3
+pos['y'] = 5.01325e-3
+pos['z'] = 35.413e-3
+pos['t'] = 0.0
+r = 0.0 # radians!
+pos['r'] = r
+origin =  [-0.25408e-3, 1.23574e-3] 
+
+
+# Go to zero position
+HFW = 3e-3
+fibsem.moveStageAbsolute(pos)
+robust_rotation(r)
+pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
+fibsem.set_HFW("ELECTRON", HFW)
+
+
+
+deltaR = np.deg2rad(deltaR_deg)
+positions = []
+r_new = 0
+positions_after_alignment = []
+
+
+
+
+# Save position data and image
+img_reference = fibsem.take_image_EB()
+cv2.imwrite(output_dir + 'raw_image_{}deg.jpg'.format(deltaR_deg), img_reference.data)    
+pixel_size = HFW / img_reference.data.shape[0]
+print('Pixel Size: {}'.format(pixel_size))
+
+
+
+for i in range(1,itrations):
+    # Move to new angle
+    r_new = i * deltaR    
+    positions.append(fibsem.getStagePosition())
+    positions[-1]['x'] = (np.cos(r_new) * (positions[0]['x'] - origin[0]) - (positions[0]['y']-origin[1])  * np.sin(r_new) + origin[0])
+    positions[-1]['y'] = (np.sin(r_new) * (positions[0]['x'] - origin[0]) + (positions[0]['y']-origin[1])  * np.cos(r_new) + origin[1])
+    positions[-1]['r'] = -r_new
+    
+    fibsem.moveStageAbsolute(positions[-1])  
+
+    img_alignment = fibsem.take_image_EB()        
+    cv2.imwrite(output_dir + 'raw_image_{}deg.jpg'.format(i*deltaR_deg), img_alignment.data)    
+
+'''
+    for i in range(3):
+        corrected_img, transformationMatrix = matchFeatures(img_reference.data,img_alignment.data)     
+        params = get_params_from_transformation_matrix(transformationMatrix, pixe_size=pixel_size)
+        # Move feature under center
+        offset = params['t_meter'][0],  params['t_meter'][1]
+        print('Offset / mm: {}'.format([1e3*x for x in offset]))
+        positions_after_alignment.append(fibsem.getStagePosition())
+        positions_after_alignment[-1]['x'] += offset[1]/2 
+        positions_after_alignment[-1]['y'] += offset[0]/2
+        fibsem.moveStageAbsolute(positions_after_alignment[-1])  
+        
+        positions_after_alignment[-1].update({'transformation': transformationMatrix})
+        positions_after_alignment[-1].update(params)        
+        img_alignment = fibsem.take_image_EB()    
+    cv2.imwrite(output_dir + 'corrected_image_{}deg.jpg'.format(i*deltaR_deg), corrected_img) 
+   
+    img_after_alignment = fibsem.take_image_EB()      
+    cv2.imwrite(output_dir + 'adjusted_image_{}deg.jpg'.format(i*deltaR_deg), img_after_alignment.data)  
+ 
+    if i == 1:        
+        keys1 = positions[0].keys()
+        with open(output_dir + "position_data.csv", 'w', newline='\n') as f:
+            write = csv.DictWriter(f, keys1)      
+            write.writeheader()                
+            print(keys1)
+            print(positions)
+            write.writerows(positions)
+
+            # Export position list
+        keys2 = positions_after_alignment[0].keys()
+        print(keys2)
+        print(positions_after_alignment)
+        with open(output_dir + "position_data_after_alignment.csv", 'w', newline='\n') as f:
+            write = csv.DictWriter(f, keys2)      
+            write.writeheader()
+            write.writerows(positions_after_alignment)
+    else:        
+        keys1 = positions[0].keys()
+        with open(output_dir + "position_data.csv", 'a', newline='\n') as f:
+            write = csv.DictWriter(f, keys1)   
+            write.writerows(positions)
+
+            # Export position list
+        keys2 = positions_after_alignment[0].keys()
+        with open(output_dir + "position_data_after_alignment.csv", 'a', newline='\n') as f:
+            write = csv.DictWriter(f, keys2)   
+            write.writerows(positions_after_alignment)
+''' 
+# Export position list
+keys = positions[0].keys()
+with open(output_dir + "position_data.csv", 'w', newline='\n') as f:
+    write = csv.DictWriter(f, keys)      
+    write.writeheader()
+    write.writerows(positions)
+
+    # Export position list
+keys = positions_after_alignment[0].keys()
+with open(output_dir + "position_data_after_alignment.csv", 'w', newline='\n') as f:
+    write = csv.DictWriter(f, keys)      
+    write.writeheader()
+    write.writerows(positions_after_alignment)

@@ -1,0 +1,188 @@
+### User Input ###
+from genericpath import exists
+import math, cv2, datetime, csv
+import numpy as np
+from pathlib import Path
+from scipy import optimize
+from itertools import compress
+from time import sleep
+
+def calculate_center_lsq(x,y, VERBOSE= True):
+    def calc_R(xc, yc):
+        """ calculate the distance of each 2D points from the center (xc, yc) """
+        return np.sqrt((x-xc)**2 + (y-yc)**2)
+    def f_2(c):
+        """ calculate the algebraic distance between the data points and the mean circle centered at c=(xc, yc) """
+        Ri = calc_R(*c)
+        return Ri - Ri.mean()
+    # coordinates of the barycenter
+    x_m = np.mean(x)
+    y_m = np.mean(y)
+    center_estimate = x_m, y_m
+    center_2, ier = optimize.leastsq(f_2, center_estimate)
+
+    xc_2, yc_2 = center_2
+    Ri_2       = calc_R(*center_2)
+    R_2        = Ri_2.mean()
+    residu_2   = sum((Ri_2 - R_2)**2)
+
+    if VERBOSE:
+        print("Center / mm: {},{}".format(xc_2*1e3,yc_2*1e3))
+        print("Radius / mm: {}".format(R_2*1e3))
+        print("Residuum: {}".format(residu_2))
+
+    return {'xc': xc_2, 'yc': yc_2, 'r': R_2, 'residuum': residu_2}
+
+
+
+def matchFeatures(img_to_align, img_reference, MIN_MATCHES=50, N_FEATURES=2000, DISPLAY_MATCHES=False):
+    orb = cv2.ORB_create(nfeatures=2000)
+    kp1, des1 = orb.detectAndCompute(img_to_align, None)
+    kp2, des2 = orb.detectAndCompute(img_reference, None)
+
+    index_params = dict(algorithm=6,
+                        table_number=6,
+                        key_size=12,
+                        multi_probe_level=2)
+    search_params = {}
+    flann = cv2.FlannBasedMatcher(index_params, search_params)
+    matches = flann.knnMatch(des1, des2, k=2)
+
+    # As per Lowe's ratio test to filter good matches
+    good_matches = []
+    for m, n in matches:
+        if m.distance < 0.75 * n.distance:
+            good_matches.append(m)
+
+    if len(good_matches) > MIN_MATCHES:
+        src_points = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        dst_points = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        mat, mask = cv2.findHomography(src_points, dst_points, cv2.RANSAC, 5.0)
+        corrected_img = cv2.warpPerspective(img_to_align, mat, (img_reference.shape[1], img_reference.shape[0]))
+        if DISPLAY_MATCHES:            
+            match_img = cv2.drawMatches(img_to_align, kp1, img_reference, kp2, good_matches[:50], None)
+            f, ax = plt.subplots()
+            ax.imshow(match_img)
+            plt.show()
+        return corrected_img, mat.copy()
+    else:
+        print('Matching failed')
+        return None, None
+
+def get_params_from_transformation_matrix(m, pixe_size=0.0, PRINT=False):
+    if np.abs(m[2,0]) > 1e-3 or np.abs(m[2,1]) > 1e-3 :
+        print("This is no valid transformation matrix, the projection component is too large.")
+        return None
+    else:
+        a,b,c,d = m[0,0] , m[0,1], m[1,0], m[1,1]
+        result = {}
+        result['transl'] = [m[0,2], m[1,2]]
+        sx, sy = np.sqrt(a ** 2 + c ** 2) , np.sqrt(b ** 2 + d ** 2)
+        result['scale']  = [sx, sy]
+        phi1,phi2 = np.rad2deg(np.arctan((c/sx)/(d/sy))), np.rad2deg(np.arctan((-b/sy)/(a/sx)))
+        result['phi']  = [phi1,phi2, np.mean([phi1,phi2])]
+        result['t_meter'] =[ t * pixe_size for t in result['transl']]           
+
+        if PRINT:                        
+            print("---Image Transformation---")
+            print("{}\n".format(m))
+            if pixel_size > 0.0:         
+                print("Translation (x,y) / mm: {:.2f}, {:.2f}".format(m[0,2]*1e3*pixel_size,m[1,2]*1e3*pixel_size))
+            print("Translation (x,y) / px: {}, {}".format(m[0,2],m[1,2]))
+            print("Scaling (x,y): {}, {}".format(result['s'][0], result['s'][1]))
+            print("Rotation Angle (x,y, mean): {}, {}, {}".format(phi1,phi2 ,round(result['phi'][2],2)))            
+            #print("Center of rotation / mm: {}, {}".format(solution[x]*1e3, solution[y]*1e3))
+        return result
+
+
+
+####################
+###User Variables###
+####################
+deltaR_deg = 10
+iterations = 1
+HFW = 3e-3
+output_dir=r'D:/User Data/Johann/220922_MeteorAutomation/' + datetime.datetime.now().strftime(r'%y%m%d_%H%M%S_') + str(deltaR_deg) + 'deg_'+ str(iterations) +'_MovementTest'
+CORRECT_VIA_FEATURE_TRACKING = True
+GENERATE_NEW_ROTATION_MODEL = False
+
+
+
+#########################################
+origin_calibrated =  (-0.25408e-3, 1.23574e-3) #FIB4
+#########################################
+
+###############################
+### Definition of variables ###
+###############################
+fibsem.output_dir   = output_dir + '/'
+stagepos            = fibsem.getStagePosition()
+deltaR = deltaR_deg * math.pi / 180
+fibsem.set_HFW("ELECTRON", HFW)
+if GENERATE_NEW_ROTATION_MODEL: 
+    origin = [0.,0.]
+else:
+    origin = origin_calibrated
+
+
+Path(output_dir).mkdir(parents=True, exist_ok=True)
+# Go to zero position
+deltaR = np.deg2rad(deltaR_deg)
+pos = stagepos
+pos['x'] = 2.01915e-3
+pos['y'] = 4.9968e-3
+pos['z'] = 35.412e-3
+pos['t'] = 0.0
+r = 0.0 # radians!
+pos['r'] = r
+fibsem.moveStageAbsolute(pos)
+
+img_0_reference = fibsem.take_image_EB()
+cv2.imwrite(output_dir + 'raw_image_{}deg.jpg'.format(r), img_0_reference.data)    
+width, height = img_0_reference.data.shape[1], img_0_reference.data.shape[0]
+pixel_size = HFW / img_0_reference.data.shape[1]
+print("Pixel Size / um: {}".format(pixel_size*1e6) )
+final_positions = []
+
+for i in range(iterations):
+    
+    r_new = (i+1) * deltaR
+
+    pos['x'] = (np.cos(r_new) * (pos['x'] - origin[0]) - (pos['y']-origin[1])  * np.sin(r_new) + origin[0])
+    pos['y'] = (np.sin(r_new) * (pos['x'] - origin[0]) + (pos['y']-origin[1])  * np.cos(r_new) + origin[1])
+    pos['r'] = -r_new
+    fibsem.moveStageAbsolute(pos)    
+    img_after_stage_rotation = fibsem.take_image_EB()    
+    cv2.imwrite(output_dir + 'raw_image_{}deg.jpg'.format(i*deltaR_deg), img_after_stage_rotation.data)    
+    sleep(10)
+
+    if CORRECT_VIA_FEATURE_TRACKING:
+
+        ## TODO, doesnt work as expected
+        rotate_matrix = cv2.getRotationMatrix2D(center=(width/2,height/2), angle=(i+1)*-deltaR_deg, scale=1)
+        img_cv2_rotated = cv2.warpAffine(src=img_0_reference.data, M=rotate_matrix, dsize=(width, height))  
+
+        corrected_img, transformationMatrix = matchFeatures(img_cv2_rotated,img_after_stage_rotation.data)     
+        params = get_params_from_transformation_matrix(transformationMatrix, pixe_size=pixel_size)
+
+        # Move feature under center
+        offset = params['t_meter'][0],  params['t_meter'][1]
+        print('Offset / mm: {}'.format([1e3*x for x in offset]))
+        print('Offset / px: {}'.format([x for x in params['transl']]))
+        position_after_alignment = fibsem.getStagePosition()
+        position_after_alignment['x'] += offset[0]
+        position_after_alignment['y'] += offset[1]
+        fibsem.moveStageAbsolute(position_after_alignment) 
+        final_positions.append(position_after_alignment)
+
+        img_after_alignment = fibsem.take_image_EB()
+        cv2.imwrite(output_dir + 'correction_cv2_image_{}deg.jpg'.format((i+1)*deltaR_deg),  img_after_alignment.data) 
+
+    if GENERATE_NEW_ROTATION_MODEL:  
+        # move to angle, let user find feature again and confirm in dialog box  
+        # OR
+        # Let user plug in new positions in SFIB, after compucentric rotation and build button    
+        x, y, angles = [p['x'] for p in final_positions],[p['y'] for p in final_positions], [np.rad2deg(p['r']) for p in final_positions]
+        result_lsq_script = calculate_center_lsq(x, y, False)
+        origin = [result_lsq_script['xc'],result_lsq_script['yc']]
+        

@@ -1,0 +1,149 @@
+@startuml
+!pragma teoz true
+
+participant MicroscopePC [
+  =Microscope PC
+  ----
+  ""SerialFIB Server""
+  ""iFLM Automation Client""
+  ]
+
+participant DriverPC [
+  =Driver PC
+  ----
+  ""xT Server""
+  ""SerialFIB Client""
+  ]
+
+participant Scios [
+  =Scios FIBSEM
+  ----
+  ""xT Client""
+  """"
+  ]
+
+participant MeteorPC [
+  =METEOR PC
+  ----
+  ""ODEMIS Server""
+  ""iFLM Automation Server""
+  ]
+participant METEOR [
+  =METEOR
+  ----
+  ""ODEMIS Client""
+  """"
+]
+
+== Setup of grid ==
+DriverPC -> Scios: Adjust eucentricity 
+loop Determine interesting features
+DriverPC -> Scios: Stage movement CMD
+DriverPC -> Scios: Adjust coincident point\n of SEM and FIB
+DriverPC -> DriverPC: Add current position
+end loop
+
+== Setup of SerialFIB Session ==
+MicroscopePC -> MicroscopePC : Setup Output dir
+
+loop Add positions to SerialFIB
+DriverPC -> Scios: Drive to marked position
+MicroscopePC -> DriverPC: Add position in SerialFIB
+MicroscopePC -> DriverPC: Take SEM and FIB alignment image
+& Scios --> DriverPC : SEM / FIB Image
+MicroscopePC -> MicroscopePC : Add lamella outlines
+end loop 
+
+group#Gold #LightBlue Automatized iFLM Workflow 
+
+== Connection to METEOR ==
+MicroscopePC -> MeteorPC: Hello? TCP on port:53215?
+activate MeteorPC
+MeteorPC -> METEOR: Startup & Calibration
+MeteorPC --> MicroscopePC : Socket Connected
+deactivate MeteorPC
+== POI Movement to METEOR Focal Point ==
+MicroscopePC -> DriverPC: Stage Movement to METEOR Focus
+activate DriverPC
+Scios <- DriverPC: xT Command
+Scios --> DriverPC: Position
+MicroscopePC <-- DriverPC: Feedback
+deactivate DriverPC
+
+== Setting up METEOR ==
+
+MicroscopePC -> MeteorPC: Drive Objective to Position
+MicroscopePC <-- MeteorPC: Ok
+
+group Package: SET_INTENSITY(float)
+MicroscopePC -> MeteorPC: Set LED Intensity in [0,1] (int) 
+MicroscopePC <-- MeteorPC: Received
+end group
+
+group Package: SET_FLUOCOLOR(int) 
+MicroscopePC -> MeteorPC: Set fluorescence color (=position of filte cube) 
+MicroscopePC <- MeteorPC: Received
+end group
+
+group Package: SET_EXPOSURE(int)
+MicroscopePC -> MeteorPC: Set exposure time in ms
+MicroscopePC <-- MeteorPC: Received
+end group
+
+group Package: SET_FOCUS(float) 
+MicroscopePC -> MeteorPC: Set absolute focus value (drive objective in)
+MeteorPC -> METEOR: Set focus abs
+MicroscopePC <-- MeteorPC: Success
+end group
+
+== Autofocus Strategy ==
+group Package: AUTOFOCUS
+MicroscopePC -> MeteorPC: Start autofocussing procedure 
+activate MeteorPC
+MeteorPC -> METEOR: Set focus abs
+MeteorPC -> METEOR: Acquire coarse test stack
+METEOR --> MeteorPC: Images
+MeteorPC -> MeteorPC: Calculate best focus
+MeteorPC -> METEOR: Adjust to new focus
+MeteorPC -> METEOR: Acquire fine test stack
+METEOR --> MeteorPC: Images
+MeteorPC -> MeteorPC: Calculate best focus
+MeteorPC -> METEOR: Adjust to new focus
+MicroscopePC <-- MeteorPC: Success
+deactivate MeteorPC
+end group
+
+
+== Acquire z-Stacks ==
+group Package: ACQUIRE_Z(Stack_Length, Stack_Step)
+MicroscopePC -> MeteorPC: Acquire a full z-Stack with defined full range and step size
+MeteorPC->METEOR: Set imaging parameters\nand acquire stack
+end group
+
+group Package: ZSTACK (np-array, NP_shape, NP_dtype)
+MicroscopePC <-- MeteorPC: Transmit the acquired stack to controller
+end group
+end group
+
+== TODO Load into SerialFIB ==
+== TODO Correlate WL-Stack to SEM Image ==
+== TODO Strategy to determine milling position ==
+
+== Prepare Lamella ==
+loop 
+MicroscopePC -> DriverPC: Drive to milling position
+MicroscopePC -> DriverPC: Create patterns and mill roughly
+group#Gold #LightBlue Automatized iFLM Workflow 
+MicroscopePC <--> METEOR
+end group
+end loop
+== Todo Check if a signal is still there ==
+loop
+MicroscopePC -> DriverPC: Drive to milling position
+MicroscopePC -> DriverPC: Create patterns and mill fine
+group#Gold #LightBlue Automatized iFLM Workflow (compensated for thin lamella)
+MicroscopePC <--> METEOR
+end group
+end loop
+== Automation of sputtering?==
+@enduml
