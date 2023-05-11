@@ -1,8 +1,8 @@
 import time, sys
-from .data_container import TCP_Package
-from .server_METEOR_wrapper import parsePackage
-from .package_exchange import _send_package, _receive_package
-from ..utils.logger import logger_server
+from src.FLM.data_container import TCP_Package
+from src.FLM.server_METEOR_wrapper import parsePackage
+from src.FLM.package_exchange import _send_package, _receive_package
+from src.FLM.utils.logger import logger_server
 
 
 def server_listener(conn,METEOR):

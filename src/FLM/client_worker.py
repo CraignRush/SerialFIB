@@ -1,9 +1,9 @@
 import time, sys, os
-from src.communication.data_container import TCP_Package
+from src.FLM.data_container import TCP_Package
 import datetime
-from src.utils.logger import logger_client
-from src.utils.config import SAVE_DEBUGGING_IMAGES
-from src.communication.package_exchange import _send_package, _receive_package
+from src.FLM.utils.logger import logger_client
+from src.FLM.utils.config import SAVE_DEBUGGING_IMAGES
+from src.FLM.package_exchange import _send_package, _receive_package
 import numpy as np
 import tifffile as tif
 

@@ -1,6 +1,6 @@
 # Imports
 import logging, sys
-from src.utils.config import LOGGER_NAME_CLIENT, LOGGER_NAME_SERVER, LOGGING_LEVEL
+from src.FLM.utils.config import LOGGER_NAME_CLIENT, LOGGER_NAME_SERVER, LOGGING_LEVEL
 # Configure logger
 logger_client = logging.getLogger(LOGGER_NAME_CLIENT)    # Modul name
 logger_client.setLevel(LOGGING_LEVEL)        # Log level

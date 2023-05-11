@@ -1,12 +1,12 @@
 import sys
 import threading
-from src.communication.server_listener import server_listener
-from src.communication.package_exchange import socket_connect
-from src.utils.config import SERVER_IP, SERVER_PORT, LOCAL_DEV
-from src.utils.logger import logger_server
+from src.FLM.server_listener import server_listener
+from src.FLM.package_exchange import socket_connect
+from src.FLM.utils.config import SERVER_IP, SERVER_PORT, LOCAL_DEV
+from src.FLM.utils.logger import logger_server
 
 #import odemis wrapper from Sven
-from FLM_driver import FLM
+from src.FLM_driver import FLM
 
 #Crypto Stuff
 #from Crypto.Cipher import AES

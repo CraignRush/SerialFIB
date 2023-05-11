@@ -3,9 +3,9 @@ import sys
 import socket, pickle
 import time
 import tqdm
-from src.utils.config import CODEC, PICKLE_PROTOCOL, TCP_BUFFER, DISPLAY_PROGESS
-from src.communication.data_container import TCP_Package
-from src.utils.logger import logger_client, logger_server
+from src.FLM.utils.config import CODEC, PICKLE_PROTOCOL, TCP_BUFFER, DISPLAY_PROGESS
+from src.FLM.data_container import TCP_Package
+from src.FLM.utils.logger import logger_client, logger_server
 import codecs
 
 def unpack(package):

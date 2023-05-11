@@ -10,8 +10,8 @@ except ImportError:
 ### SOFTWARE IMPORTS ###
 
 # from msilib.schema import Error
-from src.utils.logger import logger_server
-import src.utils.config as config
+from src.FLM.utils.logger import logger_server
+import src.FLM.utils.config as config
 import matplotlib.pyplot as plt
 import numpy as np
 import time

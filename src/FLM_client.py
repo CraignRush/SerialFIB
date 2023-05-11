@@ -1,11 +1,11 @@
 from struct import pack
 import sys
 import threading
-from src.communication.package_exchange import socket_connect
-from src.communication.client_worker import client_worker
-from src.utils.config import SERVER_IP, SERVER_PORT
-from src.communication.data_container import TCP_Package
-from src.utils.logger import logger_client
+from src.FLM.package_exchange import socket_connect
+from src.FLM.client_worker import client_worker
+from src.FLM.utils.config import SERVER_IP, SERVER_PORT
+from src.FLM.data_container import TCP_Package
+from src.FLM.utils.logger import logger_client
 
 #from Crypto.Cipher import AES
 #CIPHER_KEY=b'bQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r' #Shared Encryption/decryption Key

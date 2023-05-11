@@ -1,6 +1,6 @@
 import pickle
 import codecs
-from src.utils.config import PICKLE_PROTOCOL, CODEC
+from src.FLM.utils.config import PICKLE_PROTOCOL, CODEC
 class TCP_Package(object):
     def __init__(self, command=None, data=None, NP_shape=None, NP_dtype = None):
         self.cmd = command
