@@ -446,6 +446,9 @@ class Ui_MainWindow(object):
         self.actionSet_Meteor_GetRotationCenter = QtWidgets.QAction(MainWindow)
         self.actionSet_Meteor_GetRotationCenter.setObjectName("actionSet_Meteor_Get_Rotation_Center")       
         self.menuMeteor.addAction(self.actionSet_Meteor_GetRotationCenter)
+        self.actionSet_Meteor_Acquire_Stack = QtWidgets.QAction(MainWindow)
+        self.actionSet_Meteor_Acquire_Stack.setObjectName("actionSet_Meteor_Acquire_Stack")
+        self.menuMeteor.addAction(self.actionSet_Meteor_Acquire_Stack)
         self.actionSet_Load_Stack = QtWidgets.QAction(MainWindow)
         self.actionSet_Load_Stack.setObjectName("actionSet_Meteor_Load_Stack")       
         self.menuMeteor.addAction(self.actionSet_Load_Stack)
@@ -581,7 +584,8 @@ class Ui_MainWindow(object):
         self.actionSet_Meteor_Move_From.setText(_translate("MainWindow", "Move away"))
         self.actionSet_Meteor_Move_To.setText(_translate("MainWindow", "Move To"))        
         self.actionSet_Meteor_GetRotationCenter.setText(_translate("MainWindow", "Calibrate Rot Center"))
-        self.actionSet_Load_Stack.setText(_translate("MainWindow", "Load Stack"))
+        self.actionSet_Meteor_Acquire_Stack.setText(_translate("MainWindow", "Acquire Stack"))
+        self.actionSet_Load_Stack.setText(_translate("MainWindow", "Debug: Load Stack"))
 ##################################
 ####  BUTTON DEFINITIONS #########
 ##################################
@@ -705,6 +709,7 @@ class Ui_MainWindow(object):
         self.actionSet_Meteor_Move_From.triggered.connect(self.meteor_move_from)       
         self.actionSet_Meteor_Move_To.triggered.connect(self.meteor_move_to)
         self.actionSet_Meteor_GetRotationCenter.triggered.connect(self.meteor_calibrate_rotation)
+        self.actionSet_Meteor_Acquire_Stack.triggered.connect(self.meteor_acquire_dummy_stack)
         self.actionSet_Load_Stack.triggered.connect(self.load_stack)
         '''
         TestButtons
@@ -740,13 +745,16 @@ class Ui_MainWindow(object):
         self.display_image_in_scene(self.ImageBufferImages[self.ImageBuffer.currentRow()])
         pass
 
-    def load_stack(self):
+    def load_stack(self,path=None):
         from skimage import io
-        projfile=QtWidgets.QFileDialog.getOpenFileNames(None, "Fluorescence Stack",self.output_dir,"Images (*.tif; *.tiff)")
-        if projfile == ('', ''):
+        if path is None:
+            projfile=QtWidgets.QFileDialog.getOpenFileNames(None, "Fluorescence Stack",self.output_dir,"Images (*.tif; *.tiff)")
+            if projfile == ('', ''):
                 return
+            else:
+                path = projfile[0][0]
         try:
-            img = io.imread(projfile[0][0], plugin="tifffile")
+            img = io.imread(path, plugin="tifffile")
             print(img.shape)
             numRows = self.ImageBuffer.count()
             self.ImageBuffer.addItem(str(numRows) + " (Image Stack)")
@@ -761,7 +769,22 @@ class Ui_MainWindow(object):
             print("Incorrect file selected")
             print(sys.exc_info())
         return
+        
+    def meteor_acquire_dummy_stack(self):
+        from src.FLM_client import Client
+        c = Client()        
+        stack = c.execute_TEST()
+        numRows = self.ImageBuffer.count()
+        self.ImageBuffer.addItem(str(numRows) + " (Image Stack)")
+        self.ImageBuffer.setCurrentRow(numRows)
+        self.ImageBufferImages.append(stack)            
+        self.display_image_in_scene(stack)
+        # New Image cannot have fluorescence information, thus set checkBox to false
+        self.checkBox_fluo.setChecked(False)
+        # Adjust ImageBufferHandle to new Image
+        self.ImageBufferHandle=self.ImageBuffer.count()+1      
 
+        return
 
 ##################################
 # CODE:Button_take_image_IB      #
