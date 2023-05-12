@@ -53,13 +53,7 @@ class FLM():  # ,CAMERA_CONFIG):
         self._emission_rad = config.EMISSION_RAD
         self._excitation = config.EXCITATION
         self._emission = config.EMISSION
-        self.channel = {
-            'reflection': {'ex': self._excitation['cyan'],  'em': self._emission['ref']},
-            'uv': {'ex': self._excitation['UV'],     'em': self._emission['green']},
-            'green': {'ex': self._excitation['cyan'],   'em': self._emission['green']},
-            'orange': {'ex': self._excitation['green'],   'em': self._emission['orange']},
-            'red': {'ex': self._excitation['red'],    'em': self._emission['red']},
-        }
+        self.channel = config.CHANNEL_SETUP
 
         # Get the camera parameters from the device
         self.pixel_count = self.cam_dev.resolution.value #tuple (2456,2054)
@@ -153,11 +147,11 @@ class FLM():  # ,CAMERA_CONFIG):
         self.focus_dev.stop()
 
 # LIGHT SOURCE FUNCTIONS:
-    def light_set_channel(self, channel='reflection', intensity=20.):
+    def light_set_channel(self, channel='reflection', intensity=4.):
         '''
         Top-level wrapper to set a certain channel configuration.
         Sets a certain _excitation source and _emission filter combination
-        channel: 'reflection': EX=green, EM=None
+        channel: TODO update 'reflection': EX=green, EM=empty
                  'UV': EX=UV, EM=green
                  'green': EX=cyan, EM= green
                  'orange': EX=green, EM=orange
@@ -169,49 +163,46 @@ class FLM():  # ,CAMERA_CONFIG):
             logger_server.debug('requested channel: {}'.format(channel))
             self.light_set_filter_wheel(self.channel[channel]['em'])
             self.light_disable_all()  # clean start
-            self.light_set_source(channel, intensity)
+            self.light_set_source(self.channel[channel]['ex'], intensity)
             return
         except Exception as e:
             logger_server.error('Could not set channel')
             logger_server.debug('{}'.format(e))
             return -1
 
-    def light_set_filter_wheel(self, val: int):
+    def light_set_filter_wheel(self, filter: str):
         '''
         Low-level function to set a certain filter-wheel angle in radians.
-        val: Integer selection of predefined position.
+        chan: str, selection of predefined position.
         '''
         try:
+            filter_pos = self._emission[filter]
             task = self.filter_dev._createMoveFuture()
-            self.filter_dev._doMoveAbs(task, {"fw": self._emission_rad[val]})
+            self.filter_dev._doMoveAbs(task, {"fw": self._emission_rad[filter_pos]})
         except Exception as e:
             logger_server.error('Move to {} by the filter wheel failed.'.format(
-                {"fw": self._emission_rad[val]}))
+                {"fw": self._emission_rad[filter_pos]}))
             logger_server.debug('{}'.format(e))
         return
 
-    def light_set_source(self, channel: str, intensity: float):
+    def light_set_source(self, LED: str, intensity: float):
         '''
         Top-level wrapper for LED selection. Activates a specific LED and sets its intensity.
-        channel: Selection from 'reflection', 'UV', 'green', 'orange', 'red'
+        LED: Selection from 'UV', 'cyan', 'green', 'yellow', 'red'
         intensity: Brightness of LED, float, 0 - 100 (%)
         '''
         intensity = int(np.round(intensity / 100 * 255)
                         )  # scale intensity from percent to 8bit int for odemis api
-        source = self.channel[channel]['ex']
-        if source in self.light_enabled_sources:
-            self.light_dev._setSourceIntensity(source, intensity)
-        else:
-            self.light_enable(source)
-            self.light_dev._setSourceIntensity(source, intensity)
+        LED_num = self._excitation[LED]
+        self.light_enable(LED_num)
+        self.light_dev._setSourceIntensity(LED_num, intensity)
         return ()
 
-    def light_enable(self, source):
+    def light_enable(self, LED_num: int):
         '''
         Enables a specific light source (LED).
         '''
-        self.light_dev._enableSources([source])
-        self.light_enabled_sources.append([source])
+        self.light_dev._enableSources([LED_num])
         return ()
 
     def light_get_intensity(self):
@@ -230,16 +221,16 @@ class FLM():  # ,CAMERA_CONFIG):
             self.light_disable_single(chans[i])
         return
 
-    def light_disable_single(self, excitation_channel: str):
+    def light_disable_single(self, LED: str):
         '''
         Disables a single light source by setting the intensity to zero.
         '''
         try:
             self.light_dev._setSourceIntensity(
-                self._excitation[excitation_channel], 0)
+                self._excitation[LED], 0)
         except Exception as e:
             logger_server.error(
-                'Setting source {} to zero'.format(excitation_channel))
+                'Setting source {} to zero'.format(LED))
             logger_server.debug('{}'.format(e))
         return
 
@@ -286,7 +277,7 @@ class FLM():  # ,CAMERA_CONFIG):
         try:
             # self.cam_dev.SetHardwareGain(gain) #master gain, and single RGB gains
             self.cam_dev._setExposureTime(exp)  # exposure in secs
-            logger_server.error('Measuredxposure time: {} s'.format(
+            logger_server.debug('Measuredxposure time: {} s'.format(
                 self.cam_dev.GetExposure()))
         except Exception as e:
             logger_server.error(
@@ -368,7 +359,7 @@ class FLM():  # ,CAMERA_CONFIG):
 
     def start_acquisition(self, stackrange, step, filters: 'list[str]' = ['reflection'],
                           intensity: 'list[float]' = [8.], exposure: 'list[float]' = [0.03], focus_pos=None, format: str = "TZCYX",
-                          SAVE_STACK: bool = True, FINISH_IN_SAFE: bool = True, SUPPRESS_AUTOFOCUS=False) -> np.ndarray:
+                          SAVE_STACK: bool = True, SAVE_STACK_NAME: bool = None, FINISH_IN_SAFE: bool = True, SUPPRESS_AUTOFOCUS=False) -> np.ndarray:
         '''
         Starts the acquistion of a stack. If no focus position is given, autofocus is carried out.
         Loops through every channel and returns a TZCYX formatted stack.
@@ -449,8 +440,9 @@ class FLM():  # ,CAMERA_CONFIG):
                 return None
             else:
                 if SAVE_STACK:
-                    filename = os.path.join(os.getcwd(), datetime.datetime.now().strftime("%y_%m_%d%H_%M") +
-                                            "_len_{:.1e}_step_{:.1e}.tiff".format(stackrange, step))
+                    if SAVE_STACK_NAME is None: 
+                        filename = os.path.join(os.getcwd(), datetime.datetime.now().strftime("%y_%m_%d%H_%M") +
+                                                "_len_{:.1e}_step_{:.1e}.tiff".format(stackrange, step))
                     self.save_stack_imagej(constack, filename, z_distance=step)
 
                 if FINISH_IN_SAFE:
@@ -673,21 +665,22 @@ class FLM():  # ,CAMERA_CONFIG):
 
         return best_focused_slice
 
-    def get_formatted_stack(self, stackrange, step, dictf=None, format="TZCYX", FINISH_IN_SAFE=True):
+    def get_formatted_stack(self,step: float, slices: int, focusPos=None, format="TZCYX", FINISH_IN_SAFE=True):
         '''
-        RELICT: !!! Wrapper to acqurire different formatted stacks. Calls *get_raw_stack*, and returns either a TZCYX or XYZ formatted
+        Wrapper to acqurire different formatted stacks. Calls *get_raw_stack*, and returns either a TZCYX or XYZ formatted
         stack. 
-        stackrange: see the reference for start_acquisition
+        slices: see the reference for start_acquisition
         SAVE_STACK: Saves the stack as tiff with the current datetime to the CWD
         FINISH_IN_SAFE: Returns to a save position for future stage moves.
         '''
-        if dictf == None:
-            dictf = self.autofocus_result
-        slices = int(stackrange/step)
+        if focusPos is None:
+            focusPos = self.autofocus(self.autofocus_result)
+
+        # initalize variables
         constack = np.zeros(
             (1, slices, 1, self.pixel_count[1], self.pixel_count[0]), dtype='uint16')
 
-        stack = self.get_raw_stack(stackrange, step, focusPos=dictf)
+        stack = self.get_raw_stack(step, slices,  focusPos=focusPos)
         constack[0, :, 0, :, :] = np.transpose(
             stack, axes=(2, 1, 0))  # transpose stack from XYZ to ZYX
 

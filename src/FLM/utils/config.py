@@ -5,7 +5,7 @@ import logging
 SAMPLE_CENTERS = {"GRID 1": {'x': -3.e-3, 'y': 2.56e-3, 'z': 6.97e-3},
                   "GRID 2": {'x': 2.98e-3, 'y': 2.46e-3, 'z': 6.96e-3}}
 # ODEMIS Mirroring values (X/Y) between SEM - METEOR
-POS_COR = [24.4925e-3, 0.0641e-3] #m
+POS_COR = [24.4925e-3, 0.0641e-3]  # m
 
 
 # TCP/IP Connection protocl
@@ -31,8 +31,19 @@ CODEC = 'base64_codec'
 SAVE_DEBUGGING_IMAGES = False
 ROUGH_FOCUS_POS = 10.5e-3  # focus pos in m
 EMISSION_RAD = (0.08, 0.865398, 1.650796, 2.4361944)
-EMISSION = {'green': 0, 'ref': 1, 'orange': 2, 'red': 3} # Filter positions{'green': 2, 'ref': 3, 'orange': 1, 'red': 0} # Filter positions
-EXCITATION = {'UV': 3, 'cyan': 2, 'green': 1, 'red': 0} # Lumencor parameters.
+# # Filter positions
+EMISSION = {'green': 0, 'empty': 3, 'orange': 2, 'red': 1}
+# Lumencor parameters.
+EXCITATION = {'yellow': 4, 'UV': 3, 'cyan': 2, 'green': 1, 'red': 0}
+CHANNEL_SETUP = {
+    'reflection':   {'ex': 'cyan',  'em': 'empty'},
+    'uv':           {'ex': 'UV',    'em': 'green'},
+    'green':        {'ex': 'cyan',  'em': 'green'},
+    'orange':       {'ex': 'green', 'em': 'orange'},
+    'red':          {'ex': 'yellow','em': 'red'},
+    'far_red':      {'ex': 'red',   'em': 'red'},
+}
+
 CAMERA = {'name': 'Camera',
           'role': 'ccd',
           #        device: null, # Any one found will do, otherwise, put the serial number
