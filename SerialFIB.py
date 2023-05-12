@@ -34,6 +34,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 #############################################
 #               Function Import             #
 #############################################
@@ -50,8 +51,9 @@ from src.PatternDesigner import Ui_PatternFileEditor
 from src.LamellaDesigner import Ui_LamellaDesigner
 from src.VolumeDesigner import Ui_VolumeDesigner
 from src.Param3D import Param3D
+
 ### INITIALIZE MICROSCOPE FROM DRIVER
-scope=fibsem()
+scope = fibsem()
 ###
 
 ### Initialize Meteor
@@ -61,7 +63,7 @@ scope=fibsem()
 ### IMPORT EXTERNAL PACKAGES
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsScene, QSplashScreen
 import numpy as np
 import os
 import src
@@ -72,6 +74,8 @@ import sys
 import pickle
 import src.project_3dct as project_3dct
 import re
+
+
 ###
 class Stream(QtCore.QObject):
     '''
@@ -83,16 +87,20 @@ class Stream(QtCore.QObject):
     sys.stdout = open(r'./SFIB.log', mode='a')
 
     def write(self, text):
-        if str(text)==" ":
+        if str(text) == " ":
             print('test')
         else:
             self.newText.emit(str(text).split("\n")[0])
+
+
 # TestImage load for developing
 try:
     testimage=AdornedImage.load('./DummyImages/testimage1.tif')
     testimage2=AdornedImage.load('./DummyImages/testimage2.tif')
 except:
     print('No testcase or "wrong" developer computer')
+
+
 #############################################
 
 class Ui_MainWindow(object):
@@ -102,44 +110,45 @@ class Ui_MainWindow(object):
 
     def __init__(self):
         # Scene for the GraphicsView, SceneBuffer is a list of all the scenes that have been created
-        self.scene=QtWidgets.QGraphicsScene()
-        self.sceneBuffer=[]
+        self.scene = QtWidgets.QGraphicsScene()
+        self.sceneBuffer = []
         # Dictionary of all stage positions
-        self.StagePos={}
+        self.StagePos = {}
         # Dictionary of all patterns defined for the images in the Image Buffer.
-        self.pattern_dict={}
+        self.pattern_dict = {}
         # Image Buffer handle is a number that keeps track of which image is opened in the graphicsView
         # Image buffer images is a list of all images in the ImageBuffer
-        self.ImageBufferHandle=0
-        self.ImageBufferImages=[]
+        self.ImageBufferHandle = 0
+        self.ImageBufferImages = []
         # Output directory for outfiles
         import os
         path = r'%s' % os.getcwd().replace('\\', '/')
-        self.output_dir=path
+        self.output_dir = path
         try:
             scope.define_output_dir(self.output_dir)
         except:
             print("No Microscope connected")
-        self.SAVparamsfile=r'./SAVparams.spf'
-        self.roughmillprotocol=r'./roughmill.pro'
-        self.finemillprotocol=r'./finemill.pro'
-        self.custommillprotocol=r'./testprotocol.pro'
-        self.custompatternfile=r'./patternfile.pf'
-        self.settings=r'./standard.settings'
-        self.patternfile_trench=r'./ScriptingExamples/FilesForWaffleDev/Trenches.pf'
-        self.patternfile_notch=r'./ScriptingExamples/FilesForWaffleDev/Notch.pf'
-        self.number=0
-        self.threads=[]
+        self.SAVparamsfile = r'./SAVparams.spf'
+        self.roughmillprotocol = r'./roughmill.pro'
+        self.finemillprotocol = r'./finemill.pro'
+        self.custommillprotocol = r'./testprotocol.pro'
+        self.custompatternfile = r'./patternfile.pf'
+        self.settings = r'./standard.settings'
+        self.patternfile_trench = r'./ScriptingExamples/FilesForWaffleDev/Trenches.pf'
+        self.patternfile_notch = r'./ScriptingExamples/FilesForWaffleDev/Notch.pf'
+        self.number = 0
+        self.threads = []
         # Logfile initialization
-        self.sysout=open(self.output_dir + r'/'+r'/SFIB.log', mode='a')
-        self.log_out=''
+        self.sysout = open(self.output_dir + r'/' + r'/SFIB.log', mode='a')
+        self.log_out = ''
         # Initialization for correlation Images and associated tools, e.g. colors for displaying overlays
-        self.load_image_pixel_size=1
-        self.corrspots={}
-        self.copy=[]
-        self.pointer_projpixmap=None
-        self.colordict={"green":[0,255,0], "magenta":[255,0,255], "cyan":[0,255,255], "yellow":[255,255,0], "red":[255,0,0], "white":[255,255,255]}
-        self.CFproj=None
+        self.load_image_pixel_size = 1
+        self.corrspots = {}
+        self.copy = []
+        self.pointer_projpixmap = None
+        self.colordict = {"green": [0, 255, 0], "magenta": [255, 0, 255], "cyan": [0, 255, 255],
+                          "yellow": [255, 255, 0], "red": [255, 0, 0], "white": [255, 255, 255]}
+        self.CFproj = None
 
     def get_scene(self):
         '''
@@ -147,8 +156,8 @@ class Ui_MainWindow(object):
         Input: MainWindow class
         Output: QGraphicsScene
         '''
-        scene=self.scene
-        return(scene)
+        scene = self.scene
+        return (scene)
 
     def get_scenebuffer(self):
         '''
@@ -156,20 +165,20 @@ class Ui_MainWindow(object):
         Input: MainWindow class
         Output: List of QGraphicsScenes
         '''
-        scenebuffer=self.sceneBuffer
-        return(scenebuffer)
+        scenebuffer = self.sceneBuffer
+        return (scenebuffer)
 
-    def push_scene_to_buffer(self,scene,ImageBufferHandle):
+    def push_scene_to_buffer(self, scene, ImageBufferHandle):
         '''
         Function to overwrite the current scene given by the
         ImageBufferHandle with the given scene
         Input: scene [QGraphicsScene], ImageBufferHandle [int]
         Output: None
         '''
-        scenebuffer=self.sceneBuffer
-        scenebuffer[ImageBufferHandle]=scene
-        self.sceneBuffer=scenebuffer
-        return()     
+        scenebuffer = self.sceneBuffer
+        scenebuffer[ImageBufferHandle] = scene
+        self.sceneBuffer = scenebuffer
+        return ()
 
     def get_pattern_dict(self):
         '''
@@ -177,24 +186,25 @@ class Ui_MainWindow(object):
         Input: MainWindow class
         Output: dictionary of patterns corresponding to the images in the ImageBuffer
         '''
-        return(self.pattern_dict)
+        return (self.pattern_dict)
 
-    def push_pattern_dict(self,pattern_dict_new):
+    def push_pattern_dict(self, pattern_dict_new):
         '''
         Function to overwrite the pattern_dictionary if session file is read
         Input: pattern_dictionary
         Output: None
         '''
-        self.pattern_dict=pattern_dict_new
-        return()
+        self.pattern_dict = pattern_dict_new
+        return ()
 
     def get_number_imageBuffer(self):
         '''
         Get imageBufferHandle
         Input: Ma
         '''
-        return(self.ImageBufferHandle)
-####
+        return (self.ImageBufferHandle)
+
+    ####
     def setupUi(self, MainWindow):
         '''
         GUI Setup as created by pyuic
@@ -235,7 +245,7 @@ class Ui_MainWindow(object):
         self.Button_DeleteItem.setObjectName("Button_DeleteItem")
         self.verticalLayout.addWidget(self.Button_DeleteItem)
         ####
-        #self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
+        # self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
         # Replacing the Standard QGraphicsView with the LamellaView Class
         self.graphicsView = LamellaView(self.centralwidget)
         #####
@@ -269,12 +279,12 @@ class Ui_MainWindow(object):
         self.Button_RunTrenchMilling = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
         self.Button_RunTrenchMilling.setObjectName("Button_RunTrenchMilling")
         self.verticalLayout_4.addWidget(self.Button_RunTrenchMilling)
-        #self.Button_RunRoughMilling = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
-        #self.Button_RunRoughMilling.setObjectName("Button_RunRoughMilling")
-        #self.verticalLayout_4.addWidget(self.Button_RunRoughMilling)
-        #self.Button_RunFineMilling = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
-        #self.Button_RunFineMilling.setObjectName("Button_RunFineMilling")
-        #self.verticalLayout_4.addWidget(self.Button_RunFineMilling)
+        # self.Button_RunRoughMilling = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
+        # self.Button_RunRoughMilling.setObjectName("Button_RunRoughMilling")
+        # self.verticalLayout_4.addWidget(self.Button_RunRoughMilling)
+        # self.Button_RunFineMilling = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
+        # self.Button_RunFineMilling.setObjectName("Button_RunFineMilling")
+        # self.verticalLayout_4.addWidget(self.Button_RunFineMilling)
         self.Button_LoadCorrelationImages = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
         self.Button_LoadCorrelationImages.setObjectName("Button_LoadCorrelationImages")
         self.verticalLayout_4.addWidget(self.Button_LoadCorrelationImages)
@@ -434,23 +444,23 @@ class Ui_MainWindow(object):
         self.actionSet_Custom_Milling = QtWidgets.QAction(MainWindow)
         self.actionSet_Custom_Milling.setObjectName("actionSet_Custom_Milling")
         self.actionSet_Trench_Milling = QtWidgets.QAction(MainWindow)
-        self.actionSet_Trench_Milling.setObjectName("actionSet_Trench_Milling")        
+        self.actionSet_Trench_Milling.setObjectName("actionSet_Trench_Milling")
         self.actionSet_Notch_Milling = QtWidgets.QAction(MainWindow)
         self.actionSet_Notch_Milling.setObjectName("actionSet_Notch_Milling")
         self.actionSet_Meteor_Move_To = QtWidgets.QAction(MainWindow)
-        self.actionSet_Meteor_Move_To.setObjectName("actionSet_Meteor_Move_To")       
+        self.actionSet_Meteor_Move_To.setObjectName("actionSet_Meteor_Move_To")
         self.menuMeteor.addAction(self.actionSet_Meteor_Move_To)
         self.actionSet_Meteor_Move_From = QtWidgets.QAction(MainWindow)
-        self.actionSet_Meteor_Move_From.setObjectName("actionSet_Meteor_Move_From")       
+        self.actionSet_Meteor_Move_From.setObjectName("actionSet_Meteor_Move_From")
         self.menuMeteor.addAction(self.actionSet_Meteor_Move_From)
         self.actionSet_Meteor_GetRotationCenter = QtWidgets.QAction(MainWindow)
-        self.actionSet_Meteor_GetRotationCenter.setObjectName("actionSet_Meteor_Get_Rotation_Center")       
+        self.actionSet_Meteor_GetRotationCenter.setObjectName("actionSet_Meteor_Get_Rotation_Center")
         self.menuMeteor.addAction(self.actionSet_Meteor_GetRotationCenter)
         self.actionSet_Meteor_Acquire_Stack = QtWidgets.QAction(MainWindow)
         self.actionSet_Meteor_Acquire_Stack.setObjectName("actionSet_Meteor_Acquire_Stack")
         self.menuMeteor.addAction(self.actionSet_Meteor_Acquire_Stack)
         self.actionSet_Load_Stack = QtWidgets.QAction(MainWindow)
-        self.actionSet_Load_Stack.setObjectName("actionSet_Meteor_Load_Stack")       
+        self.actionSet_Load_Stack.setObjectName("actionSet_Meteor_Load_Stack")
         self.menuMeteor.addAction(self.actionSet_Load_Stack)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave_Session)
@@ -473,9 +483,9 @@ class Ui_MainWindow(object):
         self.menuSettings.addAction(self.actionSet_SAV_parameters)
         self.menuSettings.addAction(self.actionSet_Rough_Mill_protocol)
         self.menuSettings.addAction(self.actionSet_Fine_Mill_protocol)
-        self.menuSettings.addAction(self.actionSet_Custom_Protocol)        
-        self.menuSettings.addAction(self.actionSet_Custom_Milling)     
-        self.subMenu_Waffle = self.menuSettings.addMenu("Waffle")            
+        self.menuSettings.addAction(self.actionSet_Custom_Protocol)
+        self.menuSettings.addAction(self.actionSet_Custom_Milling)
+        self.subMenu_Waffle = self.menuSettings.addMenu("Waffle")
         self.subMenu_Waffle.addAction(self.actionSet_Trench_Milling)
         self.subMenu_Waffle.addAction(self.actionSet_Notch_Milling)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -484,7 +494,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
         self.menubar.addAction(self.menuTesting.menuAction())
         self.menubar.addAction(self.menuMeteor.menuAction())
-        #self.actionTestbutton3.triggered.connect(self.roughprotocol)
+        # self.actionTestbutton3.triggered.connect(self.roughprotocol)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -509,9 +519,9 @@ class Ui_MainWindow(object):
         self.Button_RunRoughProtocol.setText(_translate("MainWindow", "Run Rough Protocol"))
         self.Button_RunFineProtocol.setText(_translate("MainWindow", "Run Fine Protocol"))
         self.Button_RunTrenchMilling.setText(_translate("MainWindow", "Run Trench Milling"))
-        #self.Button_RunRoughMilling.setText(_translate("MainWindow", "Run Rough Milling"))
-        #self.Button_RunFineMilling.setText(_translate("MainWindow", "Run Fine Milling"))
-        self.Button_LoadCorrelationImages.setText(_translate("MainWindow", "Load Correlation Images"))        
+        # self.Button_RunRoughMilling.setText(_translate("MainWindow", "Run Rough Milling"))
+        # self.Button_RunFineMilling.setText(_translate("MainWindow", "Run Fine Milling"))
+        self.Button_LoadCorrelationImages.setText(_translate("MainWindow", "Load Correlation Images"))
         self.Button_RunWaffleMilling.setText(_translate("MainWindow", "Run Waffle Milling"))
         self.label_3.setText(_translate("MainWindow", "Alignment Image"))
         item = self.tableWidget.horizontalHeaderItem(0)
@@ -544,7 +554,7 @@ class Ui_MainWindow(object):
         self.Button_SetSAVparameters.setText(_translate("MainWindow", "Set SAV parameters"))
         self.Button_RunVolumeImaging.setText(_translate("MainWindow", "Run Volume Imaging"))
         self.Button_RunCustomProtocol.setText(_translate("MainWindow", "Run Custom Protocol"))
-        self.Button_RunCustomPatternfile.setText(_translate("MainWindow", "Run Custom Patternfile"))   
+        self.Button_RunCustomPatternfile.setText(_translate("MainWindow", "Run Custom Patternfile"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuTools.setTitle(_translate("MainWindow", "Tools"))
         self.menuCorrelation.setTitle(_translate("MainWindow", "Correlation"))
@@ -579,22 +589,22 @@ class Ui_MainWindow(object):
         self.actionSet_Custom_Protocol.setText(_translate("MainWindow", "Set Custom Protocol"))
         self.actionSet_Custom_Milling.setText(_translate("MainWindow", "Set Custom Milling"))
         self.subMenu_Waffle.setTitle(_translate("MainWindow", "Waffle"))
-        self.actionSet_Notch_Milling.setText(_translate("MainWindow", "Set Notch Pattern"))        
+        self.actionSet_Notch_Milling.setText(_translate("MainWindow", "Set Notch Pattern"))
         self.actionSet_Trench_Milling.setText(_translate("MainWindow", "Set Trench Pattern"))
         self.actionSet_Meteor_Move_From.setText(_translate("MainWindow", "Move away"))
-        self.actionSet_Meteor_Move_To.setText(_translate("MainWindow", "Move To"))        
+        self.actionSet_Meteor_Move_To.setText(_translate("MainWindow", "Move To"))
         self.actionSet_Meteor_GetRotationCenter.setText(_translate("MainWindow", "Calibrate Rot Center"))
         self.actionSet_Meteor_Acquire_Stack.setText(_translate("MainWindow", "Acquire Stack"))
         self.actionSet_Load_Stack.setText(_translate("MainWindow", "Debug: Load Stack"))
-##################################
-####  BUTTON DEFINITIONS #########
-##################################
+        ##################################
+        ####  BUTTON DEFINITIONS #########
+        ##################################
         # Testcase defintion
-        self.testCase=False
-        self.ktest=0
+        self.testCase = False
+        self.ktest = 0
         # IMAGE BUFFER DEFINE
-        self.ImageBufferImages=[]
-        #self.ImageBufferHandle=0
+        self.ImageBufferImages = []
+        # self.ImageBufferHandle=0
         '''
         Whenever an image from the image buffer is loaded by double clicking
         saving of the patterns is triggered into the pattern_dict as well as
@@ -603,7 +613,7 @@ class Ui_MainWindow(object):
         '''
         self.ImageBuffer.itemDoubleClicked.connect(self.savePatterns)
         self.ImageBuffer.itemDoubleClicked.connect(self.showInGraphview)
-        self.pattern_root=""
+        self.pattern_root = ""
         '''
         ShortCut definitions for deleting patterns and fullscreenmode
         '''
@@ -612,16 +622,16 @@ class Ui_MainWindow(object):
         self.shortcut_backspace.activated.connect(self.pattern_delete)
         self.shortcut_delete = QtWidgets.QShortcut(QtGui.QKeySequence("Del"), MainWindow)
         self.shortcut_delete.activated.connect(self.pattern_delete)
-        self.shortcut_fullscreen_graphview=QtWidgets.QShortcut(QtCore.Qt.Key_F5,MainWindow)
+        self.shortcut_fullscreen_graphview = QtWidgets.QShortcut(QtCore.Qt.Key_F5, MainWindow)
         self.shortcut_fullscreen_graphview.activated.connect(self.toggleFullScreen)
-        self.shortcut_F6=QtWidgets.QShortcut(QtCore.Qt.Key_F6,MainWindow)
+        self.shortcut_F6 = QtWidgets.QShortcut(QtCore.Qt.Key_F6, MainWindow)
         self.shortcut_F6.activated.connect(self.key_F6)
-        self.shortcut_copy=QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+c"),MainWindow)
+        self.shortcut_copy = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+c"), MainWindow)
         self.shortcut_copy.activated.connect(self.button_savePatterns)
         self.shortcut_copy.activated.connect(self.copy_patterns)
-        self.shortcut_paste=QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+v"),MainWindow)
-        self.shortcut_paste.activated.connect(self.paste_patterns)       
-        #TextLogger
+        self.shortcut_paste = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+v"), MainWindow)
+        self.shortcut_paste.activated.connect(self.paste_patterns)
+        # TextLogger
         sys.stdout = Stream(newText=self.onUpdateText)
         '''
         Button Definitions
@@ -645,7 +655,7 @@ class Ui_MainWindow(object):
         # Button Save Patterns
         self.Button_SavePatterns.pressed.connect(self.button_savePatterns)
         # Button Load Correlated Image
-        self.Button_LoadCorrelationImages.pressed.connect(self.load_correlated_image)        
+        self.Button_LoadCorrelationImages.pressed.connect(self.load_correlated_image)
         # Button Run Waffle Milling
         self.Button_RunWaffleMilling.pressed.connect(self.wafflemill)
         # Button Set Output Directory
@@ -662,7 +672,7 @@ class Ui_MainWindow(object):
         # Slider for stack looping
         self.Slider_StackSelector.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.Slider_StackSelector.valueChanged.connect(self.update_stack)
-        self.Slider_StackSelector.setRange(0,2)
+        self.Slider_StackSelector.setRange(0, 2)
         '''
         File Tab
         '''
@@ -698,15 +708,15 @@ class Ui_MainWindow(object):
         self.actionSet_Rough_Mill_protocol.triggered.connect(self.define_roughmillprotocol)
         self.actionSet_Fine_Mill_protocol.triggered.connect(self.define_finemillprotocol)
         self.actionSet_Custom_Protocol.triggered.connect(self.define_custommillprotocol)
-        self.actionSet_Custom_Milling.triggered.connect(self.define_custompatternfile)        
-        self.actionSet_Trench_Milling.triggered.connect(self.define_patternfile_trench)        
+        self.actionSet_Custom_Milling.triggered.connect(self.define_custompatternfile)
+        self.actionSet_Trench_Milling.triggered.connect(self.define_patternfile_trench)
         self.actionSet_Notch_Milling.triggered.connect(self.define_patternfile_notch)
         self.actionSaveSettings.triggered.connect(self.save_settings)
         self.actionLoadSettings.triggered.connect(self.load_settings)
         '''
         METEOR Tab
         '''
-        self.actionSet_Meteor_Move_From.triggered.connect(self.meteor_move_from)       
+        self.actionSet_Meteor_Move_From.triggered.connect(self.meteor_move_from)
         self.actionSet_Meteor_Move_To.triggered.connect(self.meteor_move_to)
         self.actionSet_Meteor_GetRotationCenter.triggered.connect(self.meteor_calibrate_rotation)
         self.actionSet_Meteor_Acquire_Stack.triggered.connect(self.meteor_acquire_dummy_stack)
@@ -721,7 +731,6 @@ class Ui_MainWindow(object):
         #### Graphics Viewer
         self.graphicsView.aspectRatioMode = QtCore.Qt.KeepAspectRatio
 
-
     # CODE:Meteor Moves      #
 
     ##################################
@@ -735,60 +744,59 @@ class Ui_MainWindow(object):
         return
 
     def meteor_calibrate_rotation(self):
-        #implement
+        # implement
         scope.find_rotation_center()
         return
 
     def update_stack(self, value):
         ## Set the new slicer here
-        #print(self.ImageBufferImages.currentItem.data)
+        # print(self.ImageBufferImages.currentItem.data)
         self.display_image_in_scene(self.ImageBufferImages[self.ImageBuffer.currentRow()])
         pass
 
-    def load_stack(self,path=None):
+    def load_stack(self):
         from skimage import io
-        if path is None:
-            projfile=QtWidgets.QFileDialog.getOpenFileNames(None, "Fluorescence Stack",self.output_dir,"Images (*.tif; *.tiff)")
-            if projfile == ('', ''):
-                return
-            else:
-                path = projfile[0][0]
+        projfile = QtWidgets.QFileDialog.getOpenFileNames(None, "Fluorescence Stack", self.output_dir,
+                                                          "Images (*.tif; *.tiff)")
+        if projfile == ('', ''):
+            return
         try:
-            img = io.imread(path, plugin="tifffile")
+            img = io.imread(projfile[0][0], plugin="tifffile")
             print(img.shape)
             numRows = self.ImageBuffer.count()
             self.ImageBuffer.addItem(str(numRows) + " (Image Stack)")
             self.ImageBuffer.setCurrentRow(numRows)
-            self.ImageBufferImages.append(img)            
+            self.ImageBufferImages.append(img)
             self.display_image_in_scene(img)
             # New Image cannot have fluorescence information, thus set checkBox to false
             self.checkBox_fluo.setChecked(False)
             # Adjust ImageBufferHandle to new Image
-            self.ImageBufferHandle=self.ImageBuffer.count()+1
+            self.ImageBufferHandle = self.ImageBuffer.count() + 1
         except:
             print("Incorrect file selected")
             print(sys.exc_info())
         return
-        
+
     def meteor_acquire_dummy_stack(self):
         from src.FLM_client import Client
-        c = Client()        
+        c = Client()
         stack = c.execute_TEST()
+        stack = np.transpose(stack[0, :, 0, :, :], axes=(2, 1, 0))
         numRows = self.ImageBuffer.count()
         self.ImageBuffer.addItem(str(numRows) + " (Image Stack)")
         self.ImageBuffer.setCurrentRow(numRows)
-        self.ImageBufferImages.append(stack)            
+        self.ImageBufferImages.append(stack)
+        ## somehow the conversion is wrong
         self.display_image_in_scene(stack)
         # New Image cannot have fluorescence information, thus set checkBox to false
         self.checkBox_fluo.setChecked(False)
         # Adjust ImageBufferHandle to new Image
-        self.ImageBufferHandle=self.ImageBuffer.count()+1      
-
+        self.ImageBufferHandle = self.ImageBuffer.count() + 1
         return
 
-##################################
-# CODE:Button_take_image_IB      #
-##################################
+    ##################################
+    # CODE:Button_take_image_IB      #
+    ##################################
     def button_take_image_IB(self):
         '''
         Button to take an image at current mag etc. using the ion beam
@@ -798,45 +806,45 @@ class Ui_MainWindow(object):
         Action: Addition of image to ImageBuffer, showing Image in GraphicsView
         '''
         # ImageBufferHandle is set to the last image as given by the amount of images in the ImageBuffer
-        self.ImageBufferHandle=self.ImageBuffer.count()
-       # Image is taken using the Driver function and added as last element in the ImageBuffer
-        img=scope.take_image_IB()
+        self.ImageBufferHandle = self.ImageBuffer.count()
+        # Image is taken using the Driver function and added as last element in the ImageBuffer
+        img = scope.take_image_IB()
         numRows = self.ImageBuffer.count()
         self.ImageBuffer.addItem(str(numRows) + " (IB Image)")
         # Image Scene is grabed in order to set a new scene in the GraphicsView
-        scene=self.get_scene()
+        scene = self.get_scene()
         scene.clear()
         self.graphicsView.setScene(scene)
         # Check if image was taken, else add testimage
-        if self.testCase==True:
-            self.ktest=self.ktest+1
-            if img==():
-                if self.ktest%2==0:
-                    array=testimage.data
+        if self.testCase == True:
+            self.ktest = self.ktest + 1
+            if img == ():
+                if self.ktest % 2 == 0:
+                    array = testimage.data
                     self.ImageBufferImages.append(testimage)
                 else:
-                    array=testimage2.data
+                    array = testimage2.data
                     self.ImageBufferImages.append(testimage2)
-                #print("Bla") 
+                    # print("Bla")
             else:
-                array=img.data
+                array = img.data
                 self.ImageBufferImages.append(img)
         else:
-            if img==():
+            if img == ():
                 print("No Microscope connected!")
-                return()
+                return ()
             else:
-                array=img.data
+                array = img.data
                 self.ImageBufferImages.append(img)
-        
+
         # New Image cannot have fluorescence information, thus set checkBox to false
         self.checkBox_fluo.setChecked(False)
         # Adjust ImageBufferHandle to new Image
-        self.ImageBufferHandle=self.ImageBuffer.count()+1
-        return()
+        self.ImageBufferHandle = self.ImageBuffer.count() + 1
+        return ()
 
     def display_image_in_scene(self, img):
-        if len(img.shape) == 3:            
+        if len(img.shape) == 3:
             self.Slider_StackSelector.setMaximum(img.shape[2])
             array = np.uint16(img[:,:,self.Slider_StackSelector.value()].data)
             self.Slider_StackSelector.setMaximum(img.shape[2]-1)
@@ -848,55 +856,59 @@ class Ui_MainWindow(object):
             channel = 0
             array_lut = np.array([])
             clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-            colors = ('green', 'red', 'white', 'magenta', 'cyan', 'yellow') #need to do because dicts are unordered in 3.5.2
+            colors = (
+            'green', 'red', 'white', 'magenta', 'cyan', 'yellow')  # need to do because dicts are unordered in 3.5.2
             for i in range(img.shape[3]):
                 # local contrast enhancement                
-                array_norm = clahe.apply(img[slice,:,:,channel])
-                #create lut
-                projColor = np.array(self.colordict[colors[i]],dtype=np.uint8)
-                scale = np.array([ i/256.0 for i in range (0,256)]).clip(0,1) #a little brightness,contrast enhancement
-                LUT = np.tile(projColor,[1,256])
-                LUT = np.array([ np.round(LUT[:,i] * scale) for i in range(3)],dtype=np.uint8)
-                array_norm_lut= np.array([cv2.LUT(array_norm, LUT[i,:]) for i in range(3)])
+                array_norm = clahe.apply(img[slice, :, :, channel])
+                # create lut
+                projColor = np.array(self.colordict[colors[i]], dtype=np.uint8)
+                scale = np.array([i / 256.0 for i in range(0, 256)]).clip(0,
+                                                                          1)  # a little brightness,contrast enhancement
+                LUT = np.tile(projColor, [1, 256])
+                LUT = np.array([np.round(LUT[:, i] * scale) for i in range(3)], dtype=np.uint8)
+                array_norm_lut = np.array([cv2.LUT(array_norm, LUT[i, :]) for i in range(3)])
                 # the next three lines slow the slice-sweeping a little down. Consider optimizing
-                #array_normalized = cv2.normalize(array_unnormalized, None, alpha=0, beta=1.2, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)                    
-                #array_normalized = np.clip(array_normalized, 0, 1)
-                #array_normalized = (255*array_normalized).astype(np.uint8)    
+                # array_normalized = cv2.normalize(array_unnormalized, None, alpha=0, beta=1.2, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+                # array_normalized = np.clip(array_normalized, 0, 1)
+                # array_normalized = (255*array_normalized).astype(np.uint8)
                 channel = channel + 1
                 if i == 0:
                     array_sum = array_norm_lut
                 else:
                     array_sum += array_norm_lut
-            array = np.moveaxis(array_sum,0,-1)
+                array = np.moveaxis(array_sum, 0, -1)
         if array.dtype == np.uint16:
-            array = cv2.convertScaleAbs(array, alpha=(255.0/65535.0))        
-        height,width=np.shape(array)[:2]
+            array = cv2.convertScaleAbs(array, alpha=(255.0 / 65535.0))
+        width, height,  = np.shape(array)[:2]
         ##TODO: Adjust historgam
         if len(img.shape) == 4:
-            qImg=QtGui.QImage(array.data.tobytes(), width, height, QtGui.QImage.Format_RGB888)#QtGui.QImage.Format_RGBA8888)
+            qImg = QtGui.QImage(array.data.tobytes(), width, height,
+                                QtGui.QImage.Format_RGB888)  # QtGui.QImage.Format_RGBA8888)
         else:
-            qImg=QtGui.QImage(array.astype(np.uint8), width, height, QtGui.QImage.Format_Grayscale8)
-        try:    
-            pixmapImg=QtGui.QPixmap.fromImage(qImg)
+            qImg = QtGui.QImage(array.data.tobytes(), width, height, QtGui.QImage.Format_Grayscale8)
+        try:
+            pixmapImg = QtGui.QPixmap.fromImage(qImg)
         except:
             print(sys.exc_info())
             return
         # Set scene size to image size.
-        scene=self.get_scene()
+        scene = self.get_scene()
         scene.clear()
         self.graphicsView.setScene(scene)
-        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect())) 
-        self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
-        #Add Image as pixmap to scene
+        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect()))
+        self.graphicsView.fitInView(self.graphicsView.sceneRect(), self.graphicsView.aspectRatioMode)
+        # Add Image as pixmap to scene
         scene.addPixmap(pixmapImg)
         # Update SceneBuffer
-        self.scene=scene
+        self.scene = scene
         self.sceneBuffer.append(self.scene)
-        return()
-##################################
-# /CODE:Button_take_image_IB     #
-##################################
-    def load_images(self,image):
+        return ()
+
+    ##################################
+    # /CODE:Button_take_image_IB     #
+    ##################################
+    def load_images(self, image):
         '''
         Same Setup as take_image_IB only that an image is loaded from a file
         Input: Image as .tif
@@ -905,38 +917,39 @@ class Ui_MainWindow(object):
         '''
         numRows = self.ImageBuffer.count()
         self.ImageBuffer.addItem(str(numRows) + " (IB Image)")
-        scene=self.get_scene()
+        scene = self.get_scene()
         scene.clear()
         self.graphicsView.setScene(scene)
         # Check if image was taken, else add testimage
-        if image==():
+        if image == ():
             print("No Microscope connected!")
-            return()
+            return ()
         else:
-            array=image.data
+            array = image.data
             self.ImageBufferImages.append(image)
         ### Convert 16 bit image to 8 bit to show it in the GrahpicsView
-        array8u=cv2.convertScaleAbs(array, alpha=(255.0/65535.0))
-        img_8bit=np.uint8(array)
-        height,width=np.shape(img_8bit)
-        qImg=QtGui.QImage(img_8bit, width, height, QtGui.QImage.Format_Grayscale8)
-        pixmapImg=QtGui.QPixmap.fromImage(qImg)
+        array8u = cv2.convertScaleAbs(array, alpha=(255.0 / 65535.0))
+        img_8bit = np.uint8(array)
+        height, width = np.shape(img_8bit)
+        qImg = QtGui.QImage(img_8bit, width, height, QtGui.QImage.Format_Grayscale8)
+        pixmapImg = QtGui.QPixmap.fromImage(qImg)
         # Set scene size to image size.
-        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect())) 
-        self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
-        w2=self.graphicsView.sceneRect().width()
-        h2=self.graphicsView.sceneRect().height()
-        #Add Image as pixmap to scene
+        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect()))
+        self.graphicsView.fitInView(self.graphicsView.sceneRect(), self.graphicsView.aspectRatioMode)
+        w2 = self.graphicsView.sceneRect().width()
+        h2 = self.graphicsView.sceneRect().height()
+        # Add Image as pixmap to scene
         scene.addPixmap(pixmapImg)
         # Update SceneBuffer
-        self.scene=scene
+        self.scene = scene
         self.sceneBuffer.append(self.scene)
         # New Image cannot have fluorescence information, thus set checkBox to false
         self.checkBox_fluo.setChecked(False)
-        return()
-##################################
-# CODE:Button_take_image_EB      #
-##################################
+        return ()
+
+    ##################################
+    # CODE:Button_take_image_EB      #
+    ##################################
     def button_take_image_EB(self):
         '''
         Button to take an image at current mag etc. using the electron beam
@@ -945,130 +958,134 @@ class Ui_MainWindow(object):
         Output: None
         Action: Addition of image to ImageBuffer, showing Image in GraphicsView
         '''
-        img=scope.take_image_EB()
+        img = scope.take_image_EB()
         numRows = self.ImageBuffer.count()
         self.ImageBuffer.addItem(str(numRows) + " (EB Image)")
-        scene=self.get_scene()
+        scene = self.get_scene()
         scene.clear()
         self.graphicsView.setScene(scene)
-        self.ImageBufferHandle=numRows
+        self.ImageBufferHandle = numRows
         # Check if image was taken, else add testimage
-        if self.testCase==True:
-            self.ktest=self.ktest+1
-            if img==():
-                if self.ktest%2==0:
-                    array=testimage.data
+        if self.testCase == True:
+            self.ktest = self.ktest + 1
+            if img == ():
+                if self.ktest % 2 == 0:
+                    array = testimage.data
                     self.ImageBufferImages.append(testimage)
                 else:
-                    array=testimage2.data
-                    self.ImageBufferImages.append(testimage2)   
+                    array = testimage2.data
+                    self.ImageBufferImages.append(testimage2)
             else:
-                array=img.data
+                array = img.data
                 self.ImageBufferImages.append(img)
         else:
-            if img==():
+            if img == ():
                 print("No Microscope connected!")
-                return()
+                return ()
             else:
-                array=img.data
+                array = img.data
                 self.ImageBufferImages.append(img)
         ### Convert 16 bit image to 8 bit to show it in the GrahpicsView
-        array8u=cv2.convertScaleAbs(array, alpha=(255.0/65535.0))
-        img_8bit=np.uint8(array)
-        height,width=np.shape(img_8bit)
-        qImg=QtGui.QImage(img_8bit, width, height, QtGui.QImage.Format_Grayscale8)
-        pixmapImg=QtGui.QPixmap.fromImage(qImg)
+        array8u = cv2.convertScaleAbs(array, alpha=(255.0 / 65535.0))
+        img_8bit = np.uint8(array)
+        height, width = np.shape(img_8bit)
+        qImg = QtGui.QImage(img_8bit, width, height, QtGui.QImage.Format_Grayscale8)
+        pixmapImg = QtGui.QPixmap.fromImage(qImg)
         # Set scene size to image size.
-        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect())) 
-        self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
-        #Add Image as pixmap to scene
+        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect()))
+        self.graphicsView.fitInView(self.graphicsView.sceneRect(), self.graphicsView.aspectRatioMode)
+        # Add Image as pixmap to scene
         scene.addPixmap(pixmapImg)
         # Update SceneBuffer
-        self.scene=scene
+        self.scene = scene
         self.sceneBuffer.append(self.scene)
         self.checkBox_fluo.setChecked(False)
-        return()
-##################################
-# /CODE:Button_take_image_EB     #
-##################################
-##################################
-# CODE:Button_run_rough_mill     #
-##################################
-    def Signal_Done(self,result):
-        print("Result: "+result)
+        return ()
+
+    ##################################
+    # /CODE:Button_take_image_EB     #
+    ##################################
+    ##################################
+    # CODE:Button_run_rough_mill     #
+    ##################################
+    def Signal_Done(self, result):
+        print("Result: " + result)
         self.progressDialog.close()
-        return()
+        return ()
+
     def showInGraphview(self, item):
-        #self.savePatterns()
-        #print(item)
+        # self.savePatterns()
+        # print(item)
         try:
-           number=self.ImageBuffer.currentItem().text().split(" ")[0]
-           #number=self.ImageBuffer.currentRow()
+            number = self.ImageBuffer.currentItem().text().split(" ")[0]
+            # number=self.ImageBuffer.currentRow()
         except:
-            number=0
-        self.ImageBufferHandle=number
-        scenes=self.get_scenebuffer()
+            number = 0
+        self.ImageBufferHandle = number
+        scenes = self.get_scenebuffer()
         try:
-            scene=scenes[int(number)]
+            scene = scenes[int(number)]
         except:
-            scene=self.get_scene()
-        pattern_list=[]
+            scene = self.get_scene()
+        pattern_list = []
         try:
             for i in self.pattern_dict[self.ImageBufferHandle]:
-                #print(i.type())
+                # print(i.type())
                 ### Check if item is Rectangle
-                #if i.type()==3:
-                #print(i)
+                # if i.type()==3:
+                # print(i)
                 pattern_list.append(i)
             if self.checkBox_fluo.isChecked():
                 if self.CFproj is not None:
                     height, width = np.shape(self.CFproj)
-                    projColor = np.array(self.colordict[self.comboBox.currentText()],dtype=np.uint8)
-                    fillImg = np.tile(projColor,[height,width,1])
-                    rgbaImg = np.dstack((fillImg,self.CFproj))
+                    projColor = np.array(self.colordict[self.comboBox.currentText()], dtype=np.uint8)
+                    fillImg = np.tile(projColor, [height, width, 1])
+                    rgbaImg = np.dstack((fillImg, self.CFproj))
                     qImg = QtGui.QImage(rgbaImg, width, height, QtGui.QImage.Format_RGBA8888)
                     pixmapImg = QtGui.QPixmap.fromImage(qImg)
                     self.pointer_projpixmap = scene.addPixmap(pixmapImg)
         except KeyError:
-            #print(self.pattern_dict[self.get_number_imageBuffer()])
+            # print(self.pattern_dict[self.get_number_imageBuffer()])
             print("Opening Image, No Patterns detected")
         scene.clear()
         self.graphicsView.setScene(scene)
         try:
-            array=self.ImageBufferImages[int(number)].data
-            array8u=cv2.convertScaleAbs(array, alpha=(255.0/65535.0))
-            img_8bit=np.uint8(array)
-            height,width=np.shape(img_8bit)
-            qImg=QtGui.QImage(img_8bit, width, height, QtGui.QImage.Format_Grayscale8)
-            pixmapImg=QtGui.QPixmap.fromImage(qImg)
+            array = self.ImageBufferImages[int(number)].data
+            array8u = cv2.convertScaleAbs(array, alpha=(255.0 / 65535.0))
+            img_8bit = np.uint8(array)
+            height, width = np.shape(img_8bit)
+            qImg = QtGui.QImage(img_8bit, width, height, QtGui.QImage.Format_Grayscale8)
+            pixmapImg = QtGui.QPixmap.fromImage(qImg)
             self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect()))  # Set scene size to image size.
-            self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
+            self.graphicsView.fitInView(self.graphicsView.sceneRect(), self.graphicsView.aspectRatioMode)
             scene.addPixmap(pixmapImg)
             for i in pattern_list:
-                scene.addItem(Rectangle(i.x,i.y,i.h,i.w))
-            self.sceneBuffer[int(number)]=scene
+                scene.addItem(Rectangle(i.x, i.y, i.h, i.w))
+            self.sceneBuffer[int(number)] = scene
         except:
             print("ERROR")
         if str(number) in self.corrspots:
-            #print("Correlation spots already exist!")
-            nonzeros=self.corrspots[str(number)]
-            xx=nonzeros[1]
-            yy=nonzeros[0]
-            corr=np.zeros(np.shape(array))
+            # print("Correlation spots already exist!")
+            nonzeros = self.corrspots[str(number)]
+            xx = nonzeros[1]
+            yy = nonzeros[0]
+            corr = np.zeros(np.shape(array))
             for i in range(len(xx)):
-                x=int(xx[i])
-                y=int(yy[i])
-                corr[x,y]=255
+                x = int(xx[i])
+                y = int(yy[i])
+                corr[x, y] = 255
                 rad = 0.5
-                scene.addEllipse(y-rad,x-rad,rad*2.0,rad*2.0,QtGui.QPen(QtCore.Qt.green, 5),QtGui.QBrush(QtCore.Qt.green, QtCore.Qt.CrossPattern))
+                scene.addEllipse(y - rad, x - rad, rad * 2.0, rad * 2.0, QtGui.QPen(QtCore.Qt.green, 5),
+                                 QtGui.QBrush(QtCore.Qt.green, QtCore.Qt.CrossPattern))
         else:
             print("No Correlation spots detected")
-########################################
-# /CODE:ImageBuffer Left Double Click  #
-########################################
-##################################
-# CODE:TextLog                   #
-##################################
+        ########################################
+        # /CODE:ImageBuffer Left Double Click  #
+        ########################################
+        ##################################
+        # CODE:TextLog                   #
+        ##################################
+
     def onUpdateText(self, text):
         now = datetime.datetime.now()
         cursor = self.plainTextEdit.textCursor()
@@ -1076,40 +1093,43 @@ class Ui_MainWindow(object):
         if not bool(str(text)):
             pass
         else:
-            cursor.insertText(now.strftime("%Y-%m-%d %H:%M ")+' : '+text+'\n')
+            cursor.insertText(now.strftime("%Y-%m-%d %H:%M ") + ' : ' + text + '\n')
             self.plainTextEdit.setTextCursor(cursor)
-            self.sysout.write(now.strftime("%Y-%m-%d %H:%M ")+' : '+text+'\n')
-##################################
-# /CODE:TextLog                  #
-##################################
-##################################
-# CODE:Button_AddPosition        #
-##################################
+            self.sysout.write(now.strftime("%Y-%m-%d %H:%M ") + ' : ' + text + '\n')
+        ##################################
+        # /CODE:TextLog                  #
+        ##################################
+        ##################################
+        # CODE:Button_AddPosition        #
+        ##################################
+
     def AddPosition(self):
-        #print(f)
+        # print(f)
         try:
-            stagepos=scope.getStagePosition()
+            stagepos = scope.getStagePosition()
             print("Position Added")
-            self.StagePos=stagepos
+            self.StagePos = stagepos
         except:
             print("Error, No Microscope Connected")
-            stagepos=scope.getStagePosition()
-            self.StagePos=stagepos
+            stagepos = scope.getStagePosition()
+            self.StagePos = stagepos
+
     def UpdateZ(self):
         try:
             numRows = self.tableWidget.rowCount()
-            row_list=[index.row() for index in self.tableWidget.selectedIndexes()]
+            row_list = [index.row() for index in self.tableWidget.selectedIndexes()]
             stagepos = scope.getStagePosition()
             self.StagePos = stagepos
-            if len(row_list)==1:
-                row=row_list[0]
+            if len(row_list) == 1:
+                row = row_list[0]
                 self.tableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(str(self.StagePos['z'])))
             else:
                 print("You selected more than 1 row")
         except:
             print("Something went wrong, please let us know!")
             print(sys.exc_info())
-        return()
+        return ()
+
     def addRow(self):
         try:
             numRows = self.tableWidget.rowCount()
@@ -1123,7 +1143,8 @@ class Ui_MainWindow(object):
         except:
             print("Something went wrong, please let us know!")
             print(sys.exc_info())
-    def addRow_load(self,label,x,y,z,r,t,alignment_image="",patterns=""):
+
+    def addRow_load(self, label, x, y, z, r, t, alignment_image="", patterns=""):
         try:
             numRows = self.tableWidget.rowCount()
             self.tableWidget.insertRow(numRows)
@@ -1138,48 +1159,50 @@ class Ui_MainWindow(object):
         except:
             print("Something went wrong, please let us know!")
             print(sys.exc_info())
-##################################
-# /CODE:Button_AddPosition       #
-##################################
-##################################
-# CODE:Button_DeleteItem         #
-##################################
+        ##################################
+        # /CODE:Button_AddPosition       #
+        ##################################
+        ##################################
+        # CODE:Button_DeleteItem         #
+        ##################################
+
     def removeRow(self):
         try:
-            row_list=[index.row() for index in self.tableWidget.selectedIndexes()]
+            row_list = [index.row() for index in self.tableWidget.selectedIndexes()]
             row_list = list(dict.fromkeys(row_list))
             for number in row_list[::-1]:
                 self.tableWidget.removeRow(number)
         except:
             print("Something went wrong, please let us know!")
             print(sys.exc_info())
-##################################
-# /CODE:Button_DeleteItem        #
-##################################
-##################################
-# CODE:Button_GoToXY             #
-##################################
+        ##################################
+        # /CODE:Button_DeleteItem        #
+        ##################################
+        ##################################
+        # CODE:Button_GoToXY             #
+        ##################################
+
     def GoToXY(self):
         try:
-            row_list=[index.row() for index in self.tableWidget.selectedIndexes()]
-            if len(row_list)==0:
+            row_list = [index.row() for index in self.tableWidget.selectedIndexes()]
+            if len(row_list) == 0:
                 print("No Position selected")
-            if len(row_list)>1:
+            if len(row_list) > 1:
                 print("You selected multiple Stage Positions")
-            if len(row_list)==1:
-                row=row_list[0]
-                print("Moving to Stage Position: "+self.tableWidget.item(row,0).text())
-                label=self.tableWidget.item(row,0).text()
-                x=float(self.tableWidget.item(row,1).text())
-                y=float(self.tableWidget.item(row,2).text())
-                stagepos={'label':label,'x':x,'y':y}
+            if len(row_list) == 1:
+                row = row_list[0]
+                print("Moving to Stage Position: " + self.tableWidget.item(row, 0).text())
+                label = self.tableWidget.item(row, 0).text()
+                x = float(self.tableWidget.item(row, 1).text())
+                y = float(self.tableWidget.item(row, 2).text())
+                stagepos = {'label': label, 'x': x, 'y': y}
                 try:
-                    origin=scope.getStagePosition()
-                    z=origin['z']
-                    t=origin['t']
-                    r=origin['r']
-                    stagepos.update({'z':z,'t':t,'r':r})
-                    if [x,y] == ['0','0']:
+                    origin = scope.getStagePosition()
+                    z = origin['z']
+                    t = origin['t']
+                    r = origin['r']
+                    stagepos.update({'z': z, 't': t, 'r': r})
+                    if [x, y] == ['0', '0']:
                         print("ERROR: Invalid Stage Position")
                     else:
                         try:
@@ -1192,32 +1215,33 @@ class Ui_MainWindow(object):
         except:
             print("Something went wrong, please let us know!")
             print(sys.exc_info())
-##################################
-# /CODE:Button_GoToXY            #
-##################################
-##################################
-# CODE:Button_GoToXYZ            #
-##################################
+        ##################################
+        # /CODE:Button_GoToXY            #
+        ##################################
+        ##################################
+        # CODE:Button_GoToXYZ            #
+        ##################################
+
     def GoToXYZ(self):
         try:
-            row_list=[index.row() for index in self.tableWidget.selectedIndexes()]
-            if len(row_list)==0:
+            row_list = [index.row() for index in self.tableWidget.selectedIndexes()]
+            if len(row_list) == 0:
                 print("No Position selected")
-            if len(row_list)>1:
+            if len(row_list) > 1:
                 print("You selected multiple Stage Positions")
-            if len(row_list)==1:
-                row=row_list[0]
-                #print(row)
-                #self.tableWidget.selectRow(row)
-                print("Moving to Stage Position: "+self.tableWidget.item(row,0).text())
-                label=self.tableWidget.item(row,0).text()
-                x=float(self.tableWidget.item(row,1).text())
-                y=float(self.tableWidget.item(row,2).text())
-                z=float(self.tableWidget.item(row,3).text())
-                r=float(self.tableWidget.item(row,4).text())
-                t=float(self.tableWidget.item(row,5).text())
-                stagepos={'label':label,'x':x,'y':y,'z':z,'t':t,'r':r}
-                if [x,y,z,t,r] == ['0','0','0','0','0']:
+            if len(row_list) == 1:
+                row = row_list[0]
+                # print(row)
+                # self.tableWidget.selectRow(row)
+                print("Moving to Stage Position: " + self.tableWidget.item(row, 0).text())
+                label = self.tableWidget.item(row, 0).text()
+                x = float(self.tableWidget.item(row, 1).text())
+                y = float(self.tableWidget.item(row, 2).text())
+                z = float(self.tableWidget.item(row, 3).text())
+                r = float(self.tableWidget.item(row, 4).text())
+                t = float(self.tableWidget.item(row, 5).text())
+                stagepos = {'label': label, 'x': x, 'y': y, 'z': z, 't': t, 'r': r}
+                if [x, y, z, t, r] == ['0', '0', '0', '0', '0']:
                     print("ERROR: Invalid Stage Position")
                 else:
                     try:
@@ -1227,229 +1251,241 @@ class Ui_MainWindow(object):
         except:
             print("Something went wrong, please let us know!")
             print(sys.exc_info())
-##################################
-# /CODE:Button_GoToXYZ           #
-##################################
-####################################
-# CODE:Button_SaveImageForAlignment#
-####################################
+        ##################################
+        # /CODE:Button_GoToXYZ           #
+        ##################################
+        ####################################
+        # CODE:Button_SaveImageForAlignment#
+        ####################################
+
     def SaveImageForAlignment(self):
-        number=self.ImageBufferHandle
+        number = self.ImageBufferHandle
         try:
-            alignment_image=self.ImageBufferImages[int(number)]
+            alignment_image = self.ImageBufferImages[int(number)]
         except:
             print("No Images taken!")
-            return()
+            return ()
         # Find Current selected and add to the Table
-        row_list=[index.row() for index in self.tableWidget.selectedIndexes()]
-        if len(row_list)==0:
+        row_list = [index.row() for index in self.tableWidget.selectedIndexes()]
+        if len(row_list) == 0:
             print("No Position selected")
-        if len(row_list)>1:
+        if len(row_list) > 1:
             print("You selected multiple Stage Positions")
-        if len(row_list)==1:
-            row=row_list[0]
+        if len(row_list) == 1:
+            row = row_list[0]
             self.tableWidget.setItem(row, 6, QtWidgets.QTableWidgetItem(number))
         else:
             self.tableWidget.setItem(0, 6, QtWidgets.QTableWidgetItem(number))
         ### One needs to check whether the pic is IB or EB here! Only IB for alignment
-        return()
-####################################
-#/CODE:Button_SaveImageForAlignment#
-####################################
-####################################
-#CODE:Button_SavePatterns          #
-####################################
+        return ()
+
+    ####################################
+    # /CODE:Button_SaveImageForAlignment#
+    ####################################
+    ####################################
+    # CODE:Button_SavePatterns          #
+    ####################################
     def savePatterns(self):
         print("Saving Patterns ...")
-        number=self.ImageBufferHandle
+        number = self.ImageBufferHandle
         self.graphicsView.items()
-        scene=self.graphicsView.scene
-        rect_list=[]
+        scene = self.graphicsView.scene
+        rect_list = []
         for i in self.graphicsView.items():
-            #print(i)
-            #print(i.type())
+            # print(i)
+            # print(i.type())
             ### Check if item is Rectangle
-            if i.type()==3:
-                pos=i.pos()
-                x=pos.x()
-                y=pos.y()
-                shape=i.shape()
-                boundingRect=shape.boundingRect()
-                w=boundingRect.width()-2
-                h=boundingRect.height()-2
-                rect_list.append(Rectangle(x,y,h,w))
-        self.pattern_dict.update({number : rect_list})
-        return()
+            if i.type() == 3:
+                pos = i.pos()
+                x = pos.x()
+                y = pos.y()
+                shape = i.shape()
+                boundingRect = shape.boundingRect()
+                w = boundingRect.width() - 2
+                h = boundingRect.height() - 2
+                rect_list.append(Rectangle(x, y, h, w))
+        self.pattern_dict.update({number: rect_list})
+        return ()
+
     def button_savePatterns(self):
         print("Saving Patterns ...")
-        number=self.ImageBufferHandle
-        if number==None:
-            number=0
+        number = self.ImageBufferHandle
+        if number == None:
+            number = 0
         # Find Current selected and add to the Table
-        row_list=[index.row() for index in self.tableWidget.selectedIndexes()]
-        if len(row_list)==0:
+        row_list = [index.row() for index in self.tableWidget.selectedIndexes()]
+        if len(row_list) == 0:
             print("No Position selected")
-        if len(row_list)>1:
+        if len(row_list) > 1:
             print("You selected multiple Stage Positions")
-        if len(row_list)==1:
-            row=row_list[0]
+        if len(row_list) == 1:
+            row = row_list[0]
             self.tableWidget.setItem(row, 7, QtWidgets.QTableWidgetItem(number))
         self.graphicsView.items()
-        scene=self.graphicsView.scene
-        rect_list=[]
+        scene = self.graphicsView.scene
+        rect_list = []
         for i in self.graphicsView.items():
-            #print(i.type())
+            # print(i.type())
             ### Check if item is Rectangle
-            if i.type()==3:
-                pos=i.pos()
-                x=pos.x()
-                y=pos.y()
-                shape=i.shape()
-                boundingRect=shape.boundingRect()
-                w=boundingRect.width()-2
-                h=boundingRect.height()-2
-                rect_list.append(Rectangle(x,y,h,w))
-        self.pattern_dict.update({number : rect_list})
-        return()
+            if i.type() == 3:
+                pos = i.pos()
+                x = pos.x()
+                y = pos.y()
+                shape = i.shape()
+                boundingRect = shape.boundingRect()
+                w = boundingRect.width() - 2
+                h = boundingRect.height() - 2
+                rect_list.append(Rectangle(x, y, h, w))
+        self.pattern_dict.update({number: rect_list})
+        return ()
+
     def write_patterns(self):
-        directory=self.output_dir+'/'
-        for i in range(0,self.tableWidget.rowCount()):
-            #print(i)
-            label=self.tableWidget.item(i,0).text()
-            lamella_dir=directory+label+'/'
+        directory = self.output_dir + '/'
+        for i in range(0, self.tableWidget.rowCount()):
+            # print(i)
+            label = self.tableWidget.item(i, 0).text()
+            lamella_dir = directory + label + '/'
             try:
                 os.mkdir(lamella_dir)
             except:
-                print("Directory "+label+" already exists")
-            alignment_image_number=int(self.tableWidget.item(i,6).text())
-            alignment_image=self.ImageBufferImages[alignment_image_number]
-            pixel_size=alignment_image.metadata.binary_result.pixel_size.x
-            image_shape=np.shape(alignment_image.data)
-            pattern_number=int(self.tableWidget.item(i,7).text())
-            #print(pattern_number)
-            if i==None:
+                print("Directory " + label + " already exists")
+            alignment_image_number = int(self.tableWidget.item(i, 6).text())
+            alignment_image = self.ImageBufferImages[alignment_image_number]
+            pixel_size = alignment_image.metadata.binary_result.pixel_size.x
+            image_shape = np.shape(alignment_image.data)
+            pattern_number = int(self.tableWidget.item(i, 7).text())
+            # print(pattern_number)
+            if i == None:
                 continue
             else:
                 try:
-                    patterns=self.pattern_dict[str(pattern_number)]
-                    patterns=sorted(patterns, key=lambda pattern: pattern.y)
-                    name_list=['tp','lamella','bp']
-                    num=0
+                    patterns = self.pattern_dict[str(pattern_number)]
+                    patterns = sorted(patterns, key=lambda pattern: pattern.y)
+                    name_list = ['tp', 'lamella', 'bp']
+                    num = 0
                     for i in patterns:
-                        pattern_filename=str(label)+'_'+str(name_list[num])+".ptf"
-                        num=num+1
-                        pos=i.pos()
-                        shape=i.shape()
-                        boundingRect=shape.boundingRect()
-                        w=boundingRect.width()
-                        h=boundingRect.height()
-                        x=(pos.x()-image_shape[1]/2)+h/2
-                        y=-w/2-(pos.y()-image_shape[0]/2)
+                        pattern_filename = str(label) + '_' + str(name_list[num]) + ".ptf"
+                        num = num + 1
+                        pos = i.pos()
+                        shape = i.shape()
+                        boundingRect = shape.boundingRect()
+                        w = boundingRect.width()
+                        h = boundingRect.height()
+                        x = (pos.x() - image_shape[1] / 2) + h / 2
+                        y = -w / 2 - (pos.y() - image_shape[0] / 2)
                         try:
-                            pattern=scope.create_pattern(x*pixel_size,y*pixel_size,w*pixel_size,h*pixel_size)
-                            scope.save_pattern(lamella_dir,pattern_filename,pattern)
+                            pattern = scope.create_pattern(x * pixel_size, y * pixel_size, w * pixel_size,
+                                                           h * pixel_size)
+                            scope.save_pattern(lamella_dir, pattern_filename, pattern)
                         except:
-                            pattern=Pattern(0,0,0,0,0,'UP')
-                            scope.save_pattern(lamella_dir,pattern_filename,pattern)
+                            pattern = Pattern(0, 0, 0, 0, 0, 'UP')
+                            scope.save_pattern(lamella_dir, pattern_filename, pattern)
                             print("Error in Pattern Writing: No Microscope connected?")
                 except KeyError:
                     print('No Patterns were found')
-####################################
-#/CODE:Button_SavePatterns         #
-####################################
-####################################
-# CODE: Alignment functions        #
-####################################
+                ####################################
+                # /CODE:Button_SavePatterns         #
+                ####################################
+                ####################################
+                # CODE: Alignment functions        #
+                ####################################
+
     def align_to_item(self):
         try:
-            img=self.ImageBufferImages[int(self.ImageBufferHandle)]
+            img = self.ImageBufferImages[int(self.ImageBufferHandle)]
         except:
             print("No Image selected. Please select an image from the Image Buffer")
         try:
-            scope.align(img,beam='ION',current=scope.get_current())
-            #print(scope.get_current())
+            scope.align(img, beam='ION', current=scope.get_current())
+            # print(scope.get_current())
         except:
             print("Something went wrong in the alignment. Please let us know!")
             print(sys.exc_info())
-        return()
+        return ()
+
     def set_alignment_current(self):
-        #while not (isinstance(param.nX, float):
+        # while not (isinstance(param.nX, float):
         ans, ok = QtWidgets.QInputDialog.getText(None, 'Missing Parameters', ''.join(
             ['Please specify the alignment current in pA']))
         if ok:
             try:
-            #print(ans)
-            #current = [float(a.strip()) for a in ans.split(',')]
-                scope.alignment_current = float(ans)*1.0e-12
+                # print(ans)
+                # current = [float(a.strip()) for a in ans.split(',')]
+                scope.alignment_current = float(ans) * 1.0e-12
             except:
                 pass
         else:
-            #scope.alignment_current=float(10*1.0e-12)
-            return()
-        return()
-####################################
-#/CODE: Alignment functions        #
-####################################
-####################################
-# CODE:Correlative mill functions  #
-####################################
+            # scope.alignment_current=float(10*1.0e-12)
+            return ()
+        return ()
+
+    ####################################
+    # /CODE: Alignment functions        #
+    ####################################
+    ####################################
+    # CODE:Correlative mill functions  #
+    ####################################
     def load_correlated_image(self):
         try:
-            imgfile, _ = QtWidgets.QFileDialog.getOpenFileName(None, "IB image before correlation",self.output_dir,"Images (*.tif)")
+            imgfile, _ = QtWidgets.QFileDialog.getOpenFileName(None, "IB image before correlation", self.output_dir,
+                                                               "Images (*.tif)")
             print(imgfile)
             self.checkBox_fluo.setChecked(False)
-            img=AdornedImage.load(imgfile)
+            img = AdornedImage.load(imgfile)
             numRows = self.ImageBuffer.count()
             self.ImageBuffer.addItem(str(numRows) + " (IB Image)")
-            scene=self.get_scene()
+            scene = self.get_scene()
             scene.clear()
             self.graphicsView.setScene(scene)
             scene.clear()
-            array=img.data
+            array = img.data
             self.ImageBufferImages.append(img)
             if img.bit_depth == 8:
-                qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width, QtGui.QImage.Format_Grayscale8)
+                qImg = QtGui.QImage(img.data.copy(), img.width, img.height, img.width, QtGui.QImage.Format_Grayscale8)
             elif img.bit_depth == 16:
-                #qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width*2, QtGui.QImage.Format_Grayscale16)
-                qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width*1, QtGui.QImage.Format_Grayscale8)
-                #img8=(img.data/256).astype('uint8')
-                #qImg=QtGui.QImage(img8.data.copy(), img.width, img.height, img.width, QtGui.QImage.Format_Grayscale8)
+                # qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width*2, QtGui.QImage.Format_Grayscale16)
+                qImg = QtGui.QImage(img.data.copy(), img.width, img.height, img.width * 1,
+                                    QtGui.QImage.Format_Grayscale8)
+                # img8=(img.data/256).astype('uint8')
+                # qImg=QtGui.QImage(img8.data.copy(), img.width, img.height, img.width, QtGui.QImage.Format_Grayscale8)
             elif img.bit_depth == 24:
-                qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width*3, QtGui.QImage.Format_RGB888)
-                #qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width*3, QtGui.QImage.Format_Grayscale8)
+                qImg = QtGui.QImage(img.data.copy(), img.width, img.height, img.width * 3, QtGui.QImage.Format_RGB888)
+                # qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width*3, QtGui.QImage.Format_Grayscale8)
             else:
-                qImg=QtGui.QImage(img.data.copy(), img.width, img.height, img.width, QtGui.QImage.Format_Grayscale8)
-            pixmapImg=QtGui.QPixmap.fromImage(qImg)
+                qImg = QtGui.QImage(img.data.copy(), img.width, img.height, img.width, QtGui.QImage.Format_Grayscale8)
+            pixmapImg = QtGui.QPixmap.fromImage(qImg)
             self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect()))  # Set scene size to image size.
-            self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
-            w2=self.graphicsView.sceneRect().width()
-            h2=self.graphicsView.sceneRect().height()
-            #print("aspect ratio is",w2/width)
+            self.graphicsView.fitInView(self.graphicsView.sceneRect(), self.graphicsView.aspectRatioMode)
+            w2 = self.graphicsView.sceneRect().width()
+            h2 = self.graphicsView.sceneRect().height()
+            # print("aspect ratio is",w2/width)
             scene.addPixmap(pixmapImg)
-            #try:
-            corrfile, _ = QtWidgets.QFileDialog.getOpenFileName(None, "3DCT text output", self.output_dir, "Text files(*.txt)")
+            # try:
+            corrfile, _ = QtWidgets.QFileDialog.getOpenFileName(None, "3DCT text output", self.output_dir,
+                                                                "Text files(*.txt)")
             param = Param3D(corrfile)
             # corr=np.zeros(np.shape(array))
             print(param.xx)
             for i in range(len(param.xx)):
-                x=int(param.xx[i])
-                y=int(param.yy[i])
+                x = int(param.xx[i])
+                y = int(param.yy[i])
                 # corr[y,x]=255
-                #self.graphicsView.paintpoint(x,y)
+                # self.graphicsView.paintpoint(x,y)
                 rad = 0.5
-                scene.addEllipse(x-rad,y-rad,rad*2.0,rad*2.0,QtGui.QPen(QtCore.Qt.green, 5),QtGui.QBrush(QtCore.Qt.green, QtCore.Qt.CrossPattern))
+                scene.addEllipse(x - rad, y - rad, rad * 2.0, rad * 2.0, QtGui.QPen(QtCore.Qt.green, 5),
+                                 QtGui.QBrush(QtCore.Qt.green, QtCore.Qt.CrossPattern))
             if str(numRows) in self.corrspots:
                 print("Correlation spots already exist!")
             else:
-            #    self.corrspots.update({str(numRows):corr_list})
-                nonzeros=[param.xx,param.yy]
-                self.corrspots.update({str(numRows):nonzeros})
-                #print(self.corrspots)
-            #except:
+                #    self.corrspots.update({str(numRows):corr_list})
+                nonzeros = [param.xx, param.yy]
+                self.corrspots.update({str(numRows): nonzeros})
+            # print(self.corrspots)
+            # except:
             #    print("Incorrect or no text output specified")
-            self.scene=scene
+            self.scene = scene
             self.sceneBuffer.append(self.scene)
-            #except:
+            # except:
             #    print("No adequate Image selected")
         except Exception as inst:
             print("No correlated image file detected or one of the files is corrupt.")
@@ -1457,36 +1493,42 @@ class Ui_MainWindow(object):
             import traceback
             traceback.print_tb(inst.__traceback__)
         return
+
     def compute_fluo_proj(self):
         try:
             from skimage import io
             # parse 3DCT text output
-            corrfile = QtWidgets.QFileDialog.getOpenFileNames(None, "3DCT text output", self.output_dir, "Text files(*.txt)")
+            corrfile = QtWidgets.QFileDialog.getOpenFileNames(None, "3DCT text output", self.output_dir,
+                                                              "Text files(*.txt)")
             if corrfile == ('', ''):
                 return
             param = Param3D(corrfile[0][0])
             # read resliced volume
-            imgfile=QtWidgets.QFileDialog.getOpenFileNames(None, "Resliced fluorescence volume",self.output_dir,"Images (*.tif)")
+            imgfile = QtWidgets.QFileDialog.getOpenFileNames(None, "Resliced fluorescence volume", self.output_dir,
+                                                             "Images (*.tif)")
             if imgfile == ('', ''):
                 return
             CF = io.imread(imgfile[0][0])
             # calculate, store and write out projection
-            self.CFproj = project_3dct.fluorescence_proj_mp(param,CF)
+            self.CFproj = project_3dct.fluorescence_proj_mp(param, CF)
             if self.CFproj is not None:
-                io.imsave(self.output_dir + '/' + imgfile[0][0].split('/')[-1].strip(".tif")+"_proj.tif",self.CFproj)
-                print("Projection image saved as "+self.output_dir + '/' + imgfile[0][0].split('/')[-1].strip(".tif")+"_proj.tif")
+                io.imsave(self.output_dir + '/' + imgfile[0][0].split('/')[-1].strip(".tif") + "_proj.tif", self.CFproj)
+                print("Projection image saved as " + self.output_dir + '/' + imgfile[0][0].split('/')[-1].strip(
+                    ".tif") + "_proj.tif")
         except:
             print("No file selected or file seems to be corrupt.")
-        #   print(sys.exc_info())
+        # print(sys.exc_info())
         return
+
     def load_fluo_proj(self):
         from skimage import io
-        projfile=QtWidgets.QFileDialog.getOpenFileNames(None, "Resliced fluorescence volume",self.output_dir,"Images (*.tif)")
+        projfile = QtWidgets.QFileDialog.getOpenFileNames(None, "Resliced fluorescence volume", self.output_dir,
+                                                          "Images (*.tif)")
         if projfile == ('', ''):
-                return
+            return
         try:
             img = io.imread(projfile[0][0])
-            if img.ndim==2 and img.dtype==np.dtype('uint8'):
+            if img.ndim == 2 and img.dtype == np.dtype('uint8'):
                 self.CFproj = img
             else:
                 print("Please select an 8-bit 2D image")
@@ -1494,6 +1536,7 @@ class Ui_MainWindow(object):
             print("Incorrect file selected")
             print(sys.exc_info())
         return
+
     # need to uncheck box when showingraphview, load, etc.
     def overlay_fluo(self):
         scene = self.get_scene()
@@ -1504,42 +1547,43 @@ class Ui_MainWindow(object):
         if self.checkBox_fluo.isChecked():
             if self.CFproj is not None:
                 height, width = np.shape(self.CFproj)
-                projColor = np.array(self.colordict[self.comboBox.currentText()],dtype=np.uint8)
-                fillImg = np.tile(projColor,[height,width,1])
-                rgbaImg = np.dstack((fillImg,self.CFproj))
+                projColor = np.array(self.colordict[self.comboBox.currentText()], dtype=np.uint8)
+                fillImg = np.tile(projColor, [height, width, 1])
+                rgbaImg = np.dstack((fillImg, self.CFproj))
                 qImg = QtGui.QImage(rgbaImg, width, height, QtGui.QImage.Format_RGBA8888)
                 pixmapImg = QtGui.QPixmap.fromImage(qImg)
-                if scene.items()==[]:
+                if scene.items() == []:
                     self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect()))  # Set scene size to image size.
-                    self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
+                    self.graphicsView.fitInView(self.graphicsView.sceneRect(), self.graphicsView.aspectRatioMode)
                 self.pointer_projpixmap = scene.addPixmap(pixmapImg)
         self.scene = scene
         return
+
     def draw_corr_pattern(self):
         print("drawing_corrpattern")
-        number=int(self.ImageBufferHandle)
+        number = int(self.ImageBufferHandle)
         try:
-            image=self.ImageBufferImages[number]
+            image = self.ImageBufferImages[number]
         except:
             return
         if str(number) in self.corrspots:
             try:
                 print("CorrSpot detected")
-                #pattern_filename=str(label)+'_'+str(name_list[num])+".ptf"
-                image_shape=np.shape(image.data)
-                nonzeros=self.corrspots[str(number)]
-                xx=nonzeros[0]
-                yy=nonzeros[1]
-                pixel_size=image.metadata.binary_result.pixel_size[0]
+                # pattern_filename=str(label)+'_'+str(name_list[num])+".ptf"
+                image_shape = np.shape(image.data)
+                nonzeros = self.corrspots[str(number)]
+                xx = nonzeros[0]
+                yy = nonzeros[1]
+                pixel_size = image.metadata.binary_result.pixel_size[0]
                 for i in range(len(xx)):
-                    x_py=xx[i]
-                    y_py=yy[i]
-                    w=1
-                    h=100
-                    x=(x_py-image_shape[1]/2)+h/2
-                    y=-w/2-(y_py-image_shape[0]/2)
+                    x_py = xx[i]
+                    y_py = yy[i]
+                    w = 1
+                    h = 100
+                    x = (x_py - image_shape[1] / 2) + h / 2
+                    y = -w / 2 - (y_py - image_shape[0] / 2)
                     try:
-                        pattern=scope.create_pattern(x*pixel_size,y*pixel_size,w*pixel_size,h*pixel_size)
+                        pattern = scope.create_pattern(x * pixel_size, y * pixel_size, w * pixel_size, h * pixel_size)
                     except:
                         print("Creating Pattern ended in error, probably outside FOV")
                         print(sys.exc_info())
@@ -1547,101 +1591,101 @@ class Ui_MainWindow(object):
                 print("No Corrspots detected.")
                 print(sys.exc_info())
         return
-####################################
-#/CODE:Correlative mill functions  #
-####################################
+
+    ####################################
+    # /CODE:Correlative mill functions  #
+    ####################################
 
 
 
-####################################
-# CODE:Define buttons              #
-####################################
+    ####################################
+    # CODE:Define buttons              #
+    ####################################
     def define_directory(self):
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Open a folder",self.output_dir)
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Open a folder", self.output_dir)
         try:
             self.sysout = open(self.output_dir + '/' + 'SFIB.log', mode='a')
             scope.define_output_dir(self.output_dir)
             self.output_dir = directory
         except:
             print("Directory not valid!")
-        return()
+        return ()
+
     def define_SAVparams(self):
         from os.path import expanduser
-        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "SAV paramsfile",self.output_dir,"SAV_paramsfile (*.spf)")
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "SAV paramsfile", self.output_dir,
+                                                          "SAV_paramsfile (*.spf)")
         try:
-            self.SAVparamsfile=filename[0][0]
+            self.SAVparamsfile = filename[0][0]
             scope.define_SAVparams_file(filename[0][0])
         except:
             print('No proper file selected.')
-        return()
+        return ()
+
     def define_roughmillprotocol(self):
         from os.path import expanduser
-        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Rough Mill Protocol File",self.output_dir,"Protocol file (*.pro)")
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Rough Mill Protocol File", self.output_dir,
+                                                          "Protocol file (*.pro)")
         try:
-            self.roughmillprotocol=filename[0][0]
-        except:
-            print('No proper file selected.')
-        return ()        
-    def define_finemillprotocol(self):
-        from os.path import expanduser
-        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File",self.output_dir,"Protocol file (*.pro)")
-        try:
-            self.finemillprotocol=filename[0][0]
-        except:
-            print('No proper file selected.')
-        return()
-    def define_custommillprotocol(self):
-        from os.path import expanduser
-        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File",self.output_dir,"Protocol file (*.pro)")
-        try:
-            self.custommillprotocol=filename[0][0]
-        except:
-            print('No proper file selected.')
-        return()
-    def define_custompatternfile(self):
-        from os.path import expanduser
-        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File",self.output_dir,"Protocol file (*.pf)")
-        try:
-            self.custompatternfile=filename[0][0]
+            self.roughmillprotocol = filename[0][0]
         except:
             print('No proper file selected.')
         return ()
+
+    def define_finemillprotocol(self):
+        from os.path import expanduser
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File", self.output_dir,
+                                                          "Protocol file (*.pro)")
+        try:
+            self.finemillprotocol = filename[0][0]
+        except:
+            print('No proper file selected.')
+        return ()
+
+    def define_custommillprotocol(self):
+        from os.path import expanduser
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File", self.output_dir,
+                                                          "Protocol file (*.pro)")
+        try:
+            self.custommillprotocol = filename[0][0]
+        except:
+            print('No proper file selected.')
+        return ()
+
+    def define_custompatternfile(self):
+        from os.path import expanduser
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Fine Mill Protocol File", self.output_dir,
+                                                          "Protocol file (*.pf)")
+        try:
+            self.custompatternfile = filename[0][0]
+        except:
+            print('No proper file selected.')
+        return ()
+
     def define_patternfile_notch(self):
         from os.path import expanduser
-        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Pattern File for Notches",self.output_dir,"Pattern file (*.pf)")
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Pattern File for Notches", self.output_dir,
+                                                          "Pattern file (*.pf)")
         try:
-            self.patternfile_notch=filename[0][0]
+            self.patternfile_notch = filename[0][0]
         except:
             print('No proper file selected.')
-        return ()        
+        return ()
+
     def define_patternfile_trench(self):
         from os.path import expanduser
-        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Pattern File for Trenches",self.output_dir,"Pattern file (*.pf)")
+        filename = QtWidgets.QFileDialog.getOpenFileNames(None, "Pattern File for Trenches", self.output_dir,
+                                                          "Pattern file (*.pf)")
         try:
-            self.patternfile_trench=filename[0][0]
+            self.patternfile_trench = filename[0][0]
         except:
             print('No proper file selected.')
-        return()
+        return ()
+
     def save_settings(self):
         try:
-            settings_file, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Select SerialFIB Setting File",self.output_dir,"SerialFIB Settings (*.settings)")
-            settingDict={}
-            settingDict.update({'output_dir':self.output_dir,
-                                'custommillprotocol':self.custommillprotocol,
-                                'custompatternfile':self.custompatternfile,
-                                'roughmillprotocol':self.roughmillprotocol,
-                                'finemillprotocol':self.finemillprotocol,
-                                'SAVparamsfile':self.SAVparamsfile})
-            with open(settings_file,'w') as output_file:
-                for i in settingDict:
-                    output_file.write(str(i)+'='+str(settingDict[i])+'\n')
-            self.settings = settings_file
-        except:
-            print(sys.exc_info())
-        return()
-    def save_settings_func(self,settings_file):
-        try:
-            #settings_file
+            settings_file, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Select SerialFIB Setting File",
+                                                                     self.output_dir, "SerialFIB Settings (*.settings)")
             settingDict = {}
             settingDict.update({'output_dir': self.output_dir,
                                 'custommillprotocol': self.custommillprotocol,
@@ -1656,66 +1700,89 @@ class Ui_MainWindow(object):
         except:
             print(sys.exc_info())
         return ()
+
+    def save_settings_func(self, settings_file):
+        try:
+            # settings_file
+            settingDict = {}
+            settingDict.update({'output_dir': self.output_dir,
+                                'custommillprotocol': self.custommillprotocol,
+                                'custompatternfile': self.custompatternfile,
+                                'roughmillprotocol': self.roughmillprotocol,
+                                'finemillprotocol': self.finemillprotocol,
+                                'SAVparamsfile': self.SAVparamsfile})
+            with open(settings_file, 'w') as output_file:
+                for i in settingDict:
+                    output_file.write(str(i) + '=' + str(settingDict[i]) + '\n')
+            self.settings = settings_file
+        except:
+            print(sys.exc_info())
+        return ()
+
     def load_settings(self):
         try:
-            settings_file, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select SerialFIB Setting File",self.output_dir,"SerialFIB Settings (*.settings)")
-            with open(settings_file,'r') as input_file:
-                lines=input_file.readlines()
-                params={}
+            settings_file, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select SerialFIB Setting File",
+                                                                     self.output_dir, "SerialFIB Settings (*.settings)")
+            with open(settings_file, 'r') as input_file:
+                lines = input_file.readlines()
+                params = {}
                 for line in lines:
-                    param=line.split('=')
-                    params.update({param[0]:param[1].rstrip()})
-            self.output_dir=params['output_dir']
-            self.custommillprotocol=params['custommillprotocol']
-            self.custompatternfile=params['custompatternfile']
-            self.roughmillprotocol=params['roughmillprotocol']
-            self.finemillprotocol=params['finemillprotocol']
-            self.SAVparamsfile=params['SAVparamsfile']
+                    param = line.split('=')
+                    params.update({param[0]: param[1].rstrip()})
+            self.output_dir = params['output_dir']
+            self.custommillprotocol = params['custommillprotocol']
+            self.custompatternfile = params['custompatternfile']
+            self.roughmillprotocol = params['roughmillprotocol']
+            self.finemillprotocol = params['finemillprotocol']
+            self.SAVparamsfile = params['SAVparamsfile']
             self.settings = settings_file
         except:
             print("Please choose a valid setting file")
             print(sys.exc_info())
-        return()
-    def load_settings_func(self,file):
-        settings_file=file
-        with open(settings_file,'r') as input_file:
-            lines=input_file.readlines()
-            params={}
+        return ()
+
+    def load_settings_func(self, file):
+        settings_file = file
+        with open(settings_file, 'r') as input_file:
+            lines = input_file.readlines()
+            params = {}
             for line in lines:
-                param=line.split('=')
-                params.update({param[0]:param[1].rstrip()})
-        self.output_dir=params['output_dir']
-        #print(params)
-        self.custommillprotocol=params['custommillprotocol']
-        self.custompatternfile=params['custompatternfile']
-        self.roughmillprotocol=params['roughmillprotocol']
-        self.finemillprotocol=params['finemillprotocol']
-        #print(self.output_dir)
-        #print(self.finemillprotocol)
-        self.SAVparamsfile=params['SAVparamsfile']
+                param = line.split('=')
+                params.update({param[0]: param[1].rstrip()})
+        self.output_dir = params['output_dir']
+        # print(params)
+        self.custommillprotocol = params['custommillprotocol']
+        self.custompatternfile = params['custompatternfile']
+        self.roughmillprotocol = params['roughmillprotocol']
+        self.finemillprotocol = params['finemillprotocol']
+        # print(self.output_dir)
+        # print(self.finemillprotocol)
+        self.SAVparamsfile = params['SAVparamsfile']
         scope.define_output_dir(self.output_dir)
         scope.define_SAVparams_file(self.SAVparamsfile)
-        return()
-####################################
-# /CODE:Define buttons             #
-####################################
-####################################
-# CODE: Diverse functions          #
-####################################
+        return ()
+
+    ####################################
+    # /CODE:Define buttons             #
+    ####################################
+    ####################################
+    # CODE: Diverse functions          #
+    ####################################
     def pattern_delete(self):
-        item=self.scene.selectedItems()
-        number=self.ImageBufferHandle
+        item = self.scene.selectedItems()
+        number = self.ImageBufferHandle
         for i in item:
             self.scene.removeItem(i)
-        return()
+        return ()
+
     def toggleFullScreen(self):
-        #return()
+        # return()
         if self.graphicsView.isFullScreen():
             print('Full Screen')
             self.key_F6()
             self.graphicsView.showNormal()
             self.graphicsView.hide()
-            self.graphicsView=LamellaView(self.centralwidget)
+            self.graphicsView = LamellaView(self.centralwidget)
             self.shortcut_backspace = QtWidgets.QShortcut(QtGui.QKeySequence("Backspace"), self.graphicsView)
             self.shortcut_backspace.activated.connect(self.pattern_delete)
             self.graphicsView.show()
@@ -1732,78 +1799,85 @@ class Ui_MainWindow(object):
             self.graphicsView.show()
             self.key_F6()
             self.overlay_fluo()
+
     def key_F6(self):
         def y_pos(element):
-            return(element.y)
+            return (element.y)
+
         self.savePatterns()
         self.showInGraphview()
-        number=self.ImageBufferHandle
-        image=self.ImageBufferImages[int(number)]
+        number = self.ImageBufferHandle
+        image = self.ImageBufferImages[int(number)]
         try:
-            pixel_size=image.metadata.binary_result.pixel_size
+            pixel_size = image.metadata.binary_result.pixel_size
         except:
-            pixel_size=self.load_image_pixel_size
+            pixel_size = self.load_image_pixel_size
             print("No Pixelsize detected, if image was loaded don't worry!")
-        item=self.scene.items()
-        patterns=[]
+        item = self.scene.items()
+        patterns = []
         for i in item:
-            if i.type()==3:
+            if i.type() == 3:
                 patterns.append(i)
         patterns.sort(key=y_pos)
         for i in patterns:
-            print("Pattern Number "+str(patterns.index(i))+str(" is ")+str(i.w*pixel_size[0]*1000000)+" µm wide.")
+            print("Pattern Number " + str(patterns.index(i)) + str(" is ") + str(
+                i.w * pixel_size[0] * 1000000) + " µm wide.")
+
     def save_session(self):
         try:
-            if self.settings==r'./custom.settings':
-                self.save_settings_func(str(self.output_dir+'/standard.settings'))
+            if self.settings == r'./custom.settings':
+                self.save_settings_func(str(self.output_dir + '/standard.settings'))
         except:
             print("Couldn't save settingsfile. Please let us know! ")
         try:
-            session_file=QtWidgets.QFileDialog.getSaveFileName(None, "An IB image before correlation",self.output_dir,"SerialFIBSessions (*.sfs)")
-            images=self.ImageBufferImages
-            correlation_spots=self.corrspots
-            num=int(self.tableWidget.rowCount())
-            patterns=self.pattern_dict
-            positions=[]
-            for i in range(0,num):
-                position=[]
-                for j in range(0,8):
-                    position.append(self.tableWidget.item(i,j).text())
+            session_file = QtWidgets.QFileDialog.getSaveFileName(None, "An IB image before correlation",
+                                                                 self.output_dir, "SerialFIBSessions (*.sfs)")
+            images = self.ImageBufferImages
+            correlation_spots = self.corrspots
+            num = int(self.tableWidget.rowCount())
+            patterns = self.pattern_dict
+            positions = []
+            for i in range(0, num):
+                position = []
+                for j in range(0, 8):
+                    position.append(self.tableWidget.item(i, j).text())
                 positions.append(position)
             print(positions)
-            pickable_pattern_dict={}
-            for i in range(0,len(images)):
+            pickable_pattern_dict = {}
+            for i in range(0, len(images)):
                 if str(i) in patterns:
-                    pattern_list=patterns[str(i)]
-                    entry=[]
+                    pattern_list = patterns[str(i)]
+                    entry = []
                     for j in pattern_list:
-                        entry.append([j.x,j.y,j.w,j.h])
-                    pickable_pattern_dict.update({i:entry})
+                        entry.append([j.x, j.y, j.w, j.h])
+                    pickable_pattern_dict.update({i: entry})
                 else:
-                    pickable_pattern_dict.update({i:[]})
-            session_dict={'images':images,'corrspots':correlation_spots,'positions':positions,'patterns':pickable_pattern_dict,'settings':self.settings}
-            with open(session_file[0],'wb') as pickle_out:
-                pickle.dump(session_dict,pickle_out)
+                    pickable_pattern_dict.update({i: []})
+            session_dict = {'images': images, 'corrspots': correlation_spots, 'positions': positions,
+                            'patterns': pickable_pattern_dict, 'settings': self.settings}
+            with open(session_file[0], 'wb') as pickle_out:
+                pickle.dump(session_dict, pickle_out)
         except:
             print("No Session file saved!")
-        return()
-####################################
-#/CODE: Diverse functions          #
-####################################
-####################################
-# CODE:Define Run button Functions #
-####################################
+        return ()
+
+    ####################################
+    # /CODE: Diverse functions          #
+    ####################################
+    ####################################
+    # CODE:Define Run button Functions #
+    ####################################
     def roughprotocol(self):
         self.number
         self.threads.append(RoughProtocolThread())
-        roughprotocol_thread=self.threads[self.number]
-        self.number=self.number+1
+        roughprotocol_thread = self.threads[self.number]
+        self.number = self.number + 1
         try:
             self.progressDialog = QtWidgets.QDialog()
             verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
-            label = QtWidgets.QLabel("Running Rough Protocol",self.progressDialog)
+            label = QtWidgets.QLabel("Running Rough Protocol", self.progressDialog)
             verticalLayout.addWidget(label)
-            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel,self.progressDialog)
+            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
             roughprotocol_thread.__init__()
             roughprotocol_thread.start()
             buttonBox.rejected.connect(self.progressDialog.reject)
@@ -1812,9 +1886,9 @@ class Ui_MainWindow(object):
             while roughprotocol_thread.isRunning():
                 if self.progressDialog.exec() == QtWidgets.QDialog.Rejected:
                     self.Signal_Done('Fine Milling stopped')
-                    #scope.stop_patterning()
+                    # scope.stop_patterning()
                     print("Fine Milling has been stopped")
-                #
+                    #
                     while roughprotocol_thread.isRunning():
                         from autoscript_sdb_microscope_client.enumerations import PatterningState
                         if scope.is_idle():
@@ -1822,8 +1896,8 @@ class Ui_MainWindow(object):
                         else:
                             scope.stop_patterning()
                             scope.stop()
-                            scope.continuerun=False
-                            roughprotocol_thread.continuerun=False
+                            scope.continuerun = False
+                            roughprotocol_thread.continuerun = False
                             roughprotocol_thread.stop()
                             self.progressDialog.close()
                             print("Operation terminated")
@@ -1833,18 +1907,19 @@ class Ui_MainWindow(object):
             print("Something went wrong with the setup.")
             print(sys.exc_info())
         self.progressDialog.close()
-        return()
+        return ()
+
     def fineprotocol(self):
         self.number
         self.threads.append(FineProtocolThread())
-        fineprotocol_thread=self.threads[self.number]
-        self.number=self.number+1
+        fineprotocol_thread = self.threads[self.number]
+        self.number = self.number + 1
         try:
             self.progressDialog = QtWidgets.QDialog()
             verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
-            label = QtWidgets.QLabel("Running Fine Milling",self.progressDialog)
+            label = QtWidgets.QLabel("Running Fine Milling", self.progressDialog)
             verticalLayout.addWidget(label)
-            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel,self.progressDialog)
+            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
             fineprotocol_thread.__init__()
             fineprotocol_thread.start()
             buttonBox.rejected.connect(self.progressDialog.reject)
@@ -1861,8 +1936,8 @@ class Ui_MainWindow(object):
                         else:
                             scope.stop_patterning()
                             scope.stop()
-                            scope.continuerun=False
-                            fineprotocol_thread.continuerun=False
+                            scope.continuerun = False
+                            fineprotocol_thread.continuerun = False
                             fineprotocol_thread.stop()
                             self.progressDialog.close()
                             print("Operation terminated")
@@ -1872,18 +1947,19 @@ class Ui_MainWindow(object):
             print("Something went wrong with the setup.")
             print(sys.exc_info())
         self.progressDialog.close()
-        return()
+        return ()
+
     def trenchmill(self):
         self.number
         self.threads.append(TrenchMillThread())
-        trenchmill_thread=self.threads[self.number]
-        self.number=self.number+1
+        trenchmill_thread = self.threads[self.number]
+        self.number = self.number + 1
         try:
             self.progressDialog = QtWidgets.QDialog()
             verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
-            label = QtWidgets.QLabel("Running Trench Milling",self.progressDialog)
+            label = QtWidgets.QLabel("Running Trench Milling", self.progressDialog)
             verticalLayout.addWidget(label)
-            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel,self.progressDialog)
+            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
             trenchmill_thread.__init__()
             trenchmill_thread.start()
             buttonBox.rejected.connect(self.progressDialog.reject)
@@ -1900,8 +1976,8 @@ class Ui_MainWindow(object):
                         else:
                             scope.stop_patterning()
                             scope.stop()
-                            scope.continuerun=False
-                            trenchmill_thread.continuerun=False
+                            scope.continuerun = False
+                            trenchmill_thread.continuerun = False
                             self.progressDialog.close()
                             print("Operation terminated")
             self.progressDialog.close()
@@ -1910,19 +1986,20 @@ class Ui_MainWindow(object):
             print("Something went wrong with the setup.")
             print(sys.exc_info())
         self.progressDialog.close()
-        #self.runRoughMill2_Done('Rough Mill stopped')
-        return()
+        # self.runRoughMill2_Done('Rough Mill stopped')
+        return ()
+
     def customprotocol(self):
         self.number
         self.threads.append(CustomProtocolThread())
-        customprotocol_thread=self.threads[self.number]
-        self.number=self.number+1
+        customprotocol_thread = self.threads[self.number]
+        self.number = self.number + 1
         try:
             self.progressDialog = QtWidgets.QDialog()
             verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
-            label = QtWidgets.QLabel("Running Custom Protocol",self.progressDialog)
+            label = QtWidgets.QLabel("Running Custom Protocol", self.progressDialog)
             verticalLayout.addWidget(label)
-            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel,self.progressDialog)
+            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
             customprotocol_thread.__init__()
             customprotocol_thread.start()
             buttonBox.rejected.connect(self.progressDialog.reject)
@@ -1939,8 +2016,8 @@ class Ui_MainWindow(object):
                         else:
                             scope.stop_patterning()
                             scope.stop()
-                            scope.continuerun=False
-                            customprotocol_thread.continuerun=False
+                            scope.continuerun = False
+                            customprotocol_thread.continuerun = False
                             customprotocol_thread.stop()
                             self.progressDialog.close()
                             print("Operation terminated")
@@ -1950,15 +2027,16 @@ class Ui_MainWindow(object):
             print("Something went wrong with the setup.")
             print(sys.exc_info())
         self.progressDialog.close()
-        return()
+        return ()
+
     def volumeimaging(self):
         try:
             self.progressDialog = QtWidgets.QDialog()
             verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
-            label = QtWidgets.QLabel("Running Volume Imaging",self.progressDialog)
+            label = QtWidgets.QLabel("Running Volume Imaging", self.progressDialog)
             verticalLayout.addWidget(label)
-            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel,self.progressDialog)
-            volumeimaging_thread=VolumeImagingThread()
+            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
+            volumeimaging_thread = VolumeImagingThread()
             volumeimaging_thread.__init__()
             volumeimaging_thread.start()
             buttonBox.rejected.connect(self.progressDialog.reject)
@@ -1975,8 +2053,8 @@ class Ui_MainWindow(object):
                         else:
                             scope.stop_patterning()
                             scope.stop()
-                            scope.continuerun=False
-                            volumeimaging_thread.continuerun=False
+                            scope.continuerun = False
+                            volumeimaging_thread.continuerun = False
                             volumeimaging_thread.stop()
                             self.progressDialog.close()
                             print("Operation terminated")
@@ -1986,15 +2064,16 @@ class Ui_MainWindow(object):
             print("Something went wrong with the setup.")
             print(sys.exc_info())
         self.progressDialog.close()
-        return()
+        return ()
+
     def custompatternfilerun(self):
         try:
             self.progressDialog = QtWidgets.QDialog()
             verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
-            label = QtWidgets.QLabel("Running Custom Patternfile",self.progressDialog)
+            label = QtWidgets.QLabel("Running Custom Patternfile", self.progressDialog)
             verticalLayout.addWidget(label)
-            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel,self.progressDialog)
-            custompatternfile_thread=CustomPatternfileThread()
+            buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
+            custompatternfile_thread = CustomPatternfileThread()
             custompatternfile_thread.__init__()
             custompatternfile_thread.start()
             buttonBox.rejected.connect(self.progressDialog.reject)
@@ -2012,8 +2091,8 @@ class Ui_MainWindow(object):
                         else:
                             scope.stop_patterning()
                             scope.stop()
-                            scope.continuerun=False
-                            custompatternfile_thread.continuerun=False
+                            scope.continuerun = False
+                            custompatternfile_thread.continuerun = False
                             custompatternfile_thread.stop()
                             self.progressDialog.close()
                             print("Operation terminated")
@@ -2024,19 +2103,19 @@ class Ui_MainWindow(object):
             print(sys.exc_info())
         self.progressDialog.close()
         return ()
-        
+
     def wafflemill(self):
         try:
             self.progressDialog = QtWidgets.QDialog()
             verticalLayout = QtWidgets.QVBoxLayout(self.progressDialog)
-            label = QtWidgets.QLabel("Running waffle milling protocol",self.progressDialog)
+            label = QtWidgets.QLabel("Running waffle milling protocol", self.progressDialog)
             verticalLayout.addWidget(label)
             buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.progressDialog)
-            self.number            
+            self.number
             for steps in range(3):
                 self.threads.append(WaffleMillThread())
-                WaffleMillThread=self.threads[self.number]
-                self.number = self.number + 1  
+                WaffleMillThread = self.threads[self.number]
+                self.number = self.number + 1
                 WaffleMillThread.__init__()
                 WaffleMillThread.step = steps
                 WaffleMillThread.start()
@@ -2046,9 +2125,9 @@ class Ui_MainWindow(object):
                 while wafflemill_thread.isRunning():
                     if self.progressDialog.exec() == QtWidgets.QDialog.Rejected:
                         self.Signal_Done('waffle milling stopped')
-                        #scope.stop_patterning()
+                        # scope.stop_patterning()
                         print("waffle milling  stopped")
-                    #
+                        #
                         while WaffleMillThread.isRunning():
                             from autoscript_sdb_microscope_client.enumerations import PatterningState
                             if scope.is_idle():
@@ -2056,8 +2135,8 @@ class Ui_MainWindow(object):
                             else:
                                 scope.stop_patterning()
                                 scope.stop()
-                                scope.continuerun=False
-                                WaffleMillThread.continuerun=False
+                                scope.continuerun = False
+                                WaffleMillThread.continuerun = False
                                 WaffleMillThread.stop()
                                 self.progressDialog.close()
                                 print("Operation terminated")
@@ -2067,57 +2146,61 @@ class Ui_MainWindow(object):
             print("Something went wrong with the setup.")
             print(sys.exc_info())
         self.progressDialog.close()
-        return()
-####################################
-#/CODE:Define Run button Functions #
-####################################
-####################################
-# CODE:Session Functions           #
-####################################
+        return ()
+
+    ####################################
+    # /CODE:Define Run button Functions #
+    ####################################
+    ####################################
+    # CODE:Session Functions           #
+    ####################################
     def new_session(self):
         self.newSessionDialog = QtWidgets.QDialog()
         verticalLayout = QtWidgets.QHBoxLayout(self.newSessionDialog)
-        label = QtWidgets.QLabel("Start new session?",self.newSessionDialog)
+        label = QtWidgets.QLabel("Start new session?", self.newSessionDialog)
         verticalLayout.addWidget(label)
-        buttonBox2 = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok,self.newSessionDialog)
+        buttonBox2 = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok, self.newSessionDialog)
         buttonBox2.accepted.connect(self.newSessionDialog.accept)
         verticalLayout.addWidget(buttonBox2)
-        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel,self.newSessionDialog)
+        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Cancel, self.newSessionDialog)
         buttonBox.rejected.connect(self.newSessionDialog.reject)
         verticalLayout.addWidget(buttonBox)
-        executed=self.newSessionDialog.exec()
-        if  executed == QtWidgets.QDialog.Rejected:
+        executed = self.newSessionDialog.exec()
+        if executed == QtWidgets.QDialog.Rejected:
             print("No new session")
             return None
         elif executed == QtWidgets.QDialog.Accepted:
             print("New session")
-            self.pattern_dict={}
-            scene=QtWidgets.QGraphicsScene()
+            self.pattern_dict = {}
+            scene = QtWidgets.QGraphicsScene()
             self.graphicsView.setScene(scene)
-            self.StagePos={}
-            self.pattern_dict={}
-            self.ImageBufferHandle=0
-            self.load_image_pixel_size=1
-            self.corrspots={}
-            self.ImageBufferImages=[]
-            self.pointer_projpixmap=None
-            self.colordict={"green":[0,255,0], "magenta":[255,0,255], "cyan":[0,255,255], "yellow":[255,255,0], "red":[255,0,0], "white":[255,255,255]}
-            self.CFproj=None
+            self.StagePos = {}
+            self.pattern_dict = {}
+            self.ImageBufferHandle = 0
+            self.load_image_pixel_size = 1
+            self.corrspots = {}
+            self.ImageBufferImages = []
+            self.pointer_projpixmap = None
+            self.colordict = {"green": [0, 255, 0], "magenta": [255, 0, 255], "cyan": [0, 255, 255],
+                              "yellow": [255, 255, 0], "red": [255, 0, 0], "white": [255, 255, 255]}
+            self.CFproj = None
             self.ImageBuffer.clear()
-            #self.tableWidget.clear()
+            # self.tableWidget.clear()
             for i in range(self.tableWidget.rowCount()):
                 self.tableWidget.removeRow(i)
             return None
-        return()
+        return ()
+
     def load_session(self):
         try:
-            session_file=QtWidgets.QFileDialog.getOpenFileNames(None, "An IB image before correlation",self.output_dir,"SerialFIBSessions (*.sfs)")
+            session_file = QtWidgets.QFileDialog.getOpenFileNames(None, "An IB image before correlation",
+                                                                  self.output_dir, "SerialFIBSessions (*.sfs)")
             numRows = self.ImageBuffer.count()
-            with open(session_file[0][0],'rb') as pickle_in:
-                session_dict=pickle.load(pickle_in)
+            with open(session_file[0][0], 'rb') as pickle_in:
+                session_dict = pickle.load(pickle_in)
                 ### Load Stage Positions
                 for i in session_dict['positions']:
-                    self.addRow_load(i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7])
+                    self.addRow_load(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7])
                 ### Load Images
                 for i in session_dict['images']:
                     self.load_images(i)
@@ -2125,136 +2208,146 @@ class Ui_MainWindow(object):
                 for i in session_dict['patterns']:
                     self.scene.clear()
                     for j in session_dict['patterns'][i]:
-                        self.scene.addItem(Rectangle(j[0],j[1],j[3],j[2]))
+                        self.scene.addItem(Rectangle(j[0], j[1], j[3], j[2]))
                         self.graphicsView.setScene(self.scene)
                         try:
-                            old_list=self.pattern_dict[str(numRows)]
+                            old_list = self.pattern_dict[str(numRows)]
                         except KeyError:
-                            old_list=[]
-                        self.pattern_dict.update({str(numRows) : old_list+[Rectangle(j[0],j[1],j[2],j[3])]})
-                    numRows=numRows+1
-                #try:
-                self.settings=session_dict['settings']
+                            old_list = []
+                        self.pattern_dict.update({str(numRows): old_list + [Rectangle(j[0], j[1], j[2], j[3])]})
+                    numRows = numRows + 1
+                # try:
+                self.settings = session_dict['settings']
                 self.load_settings_func(self.settings)
-                #except:
+                # except:
                 #    print("No settings file was saved, using standard settings")
                 #    self.load_settings_func(self.settings)
                 self.scene.clear()
-                #print(self.pattern_dict)
+                # print(self.pattern_dict)
                 # Pickle cannot handle patterns. You need to save the entire x,y,w,h parameters here
-                #self.patterns.update(session_dict['patterns'])
+                # self.patterns.update(session_dict['patterns'])
         except:
             print("No Session File loaded")
-        return()
-####################################
-#/CODE:Session Functions           #
-####################################
-####################################
-# CODE: "Tools" Functions          #
-####################################
+        return ()
+
+    ####################################
+    # /CODE:Session Functions           #
+    ####################################
+    ####################################
+    # CODE: "Tools" Functions          #
+    ####################################
     def get_for_scripting(self):
         row_count = self.tableWidget.rowCount()
-        stagepositions=[]
+        stagepositions = []
         for i in range(row_count):
-            self.log_out=''
-            #if self.tableWidget.item(i,7)==None:
+            self.log_out = ''
+            # if self.tableWidget.item(i,7)==None:
             #    print("Skipping Position "+str(self.tableWidget.item(i,0).text()))
-            #else:
-            label=self.tableWidget.item(i,0).text()
-            x=float(self.tableWidget.item(i,1).text())
-            y=float(self.tableWidget.item(i,2).text())
-            z=float(self.tableWidget.item(i,3).text())
-            r=float(self.tableWidget.item(i,4).text())
-            t=float(self.tableWidget.item(i,5).text())
+            # else:
+            label = self.tableWidget.item(i, 0).text()
+            x = float(self.tableWidget.item(i, 1).text())
+            y = float(self.tableWidget.item(i, 2).text())
+            z = float(self.tableWidget.item(i, 3).text())
+            r = float(self.tableWidget.item(i, 4).text())
+            t = float(self.tableWidget.item(i, 5).text())
             try:
-                alignment_image=float(self.tableWidget.item(i,6).text())
-                patterns=float(self.tableWidget.item(i,7).text())
-                stagepos = {'label': label, 'x': x, 'y': y, 'z': z, 't': t, 'r': r, 'patterns':patterns, 'image':alignment_image}
+                alignment_image = float(self.tableWidget.item(i, 6).text())
+                patterns = float(self.tableWidget.item(i, 7).text())
+                stagepos = {'label': label, 'x': x, 'y': y, 'z': z, 't': t, 'r': r, 'patterns': patterns,
+                            'image': alignment_image}
             except:
-                stagepos = {'label': label, 'x': x, 'y': y, 'z': z, 't': t, 'r': r, 'patterns':'', 'image':''}
+                stagepos = {'label': label, 'x': x, 'y': y, 'z': z, 't': t, 'r': r, 'patterns': '', 'image': ''}
             stagepositions.append(stagepos)
-        images=self.ImageBufferImages
-        patterns=self.pattern_dict
-        pickable_pattern_dict={}
-        #for i in patterns:
-        for i in range(0,len(images)):
+        images = self.ImageBufferImages
+        patterns = self.pattern_dict
+        pickable_pattern_dict = {}
+        # for i in patterns:
+        for i in range(0, len(images)):
             if str(i) in patterns:
-                pattern_list=patterns[str(i)]
-                entry=[]
+                pattern_list = patterns[str(i)]
+                entry = []
                 for j in pattern_list:
-                    #print(j.x,j.y,j.w,j.h)
-                    entry.append([j.x,j.y,j.w,j.h])
-                pickable_pattern_dict.update({i:entry})
+                    # print(j.x,j.y,j.w,j.h)
+                    entry.append([j.x, j.y, j.w, j.h])
+                pickable_pattern_dict.update({i: entry})
             else:
-                pickable_pattern_dict.update({i:[]})
-        return (stagepositions,images,pickable_pattern_dict)
+                pickable_pattern_dict.update({i: []})
+        return (stagepositions, images, pickable_pattern_dict)
+
     def open_scripting(self):
-        stagepositions,images,patterns=self.get_for_scripting()
-        widget=QtWidgets.QDialog()
-        ui=Ui_ScriptEditor()
-        ui.setupUi(widget,stagepositions,images,patterns)
+        stagepositions, images, patterns = self.get_for_scripting()
+        widget = QtWidgets.QDialog()
+        ui = Ui_ScriptEditor()
+        ui.setupUi(widget, stagepositions, images, patterns)
         widget.exec_()
-        return()
+        return ()
+
     def open_patterneditor(self):
-        widget=QtWidgets.QDialog()
-        ui=Ui_PatternFileEditor()
+        widget = QtWidgets.QDialog()
+        ui = Ui_PatternFileEditor()
         ui.setupUi(widget)
         widget.exec_()
-        return()
+        return ()
+
     def open_volumedesigner(self):
-        widget=QtWidgets.QDialog()
-        ui=Ui_VolumeDesigner()
+        widget = QtWidgets.QDialog()
+        ui = Ui_VolumeDesigner()
         ui.setupUi(widget)
         widget.exec_()
-        return()
+        return ()
+
     def open_lamelladesigner(self):
-        widget=QtWidgets.QDialog()
-        ui=Ui_LamellaDesigner()
+        widget = QtWidgets.QDialog()
+        ui = Ui_LamellaDesigner()
         ui.setupUi(widget)
         widget.exec_()
-        return()
-####################################
-#/CODE: "Tools" Functions          #
-####################################
-####################################
-# CODE:Pattern handling Functions  #
-####################################
+        return ()
+
+    ####################################
+    # /CODE: "Tools" Functions          #
+    ####################################
+    ####################################
+    # CODE:Pattern handling Functions  #
+    ####################################
     def copy_patterns(self):
-            print("Patterns copied")
-            self.savePatterns()
-            items=self.scene.items()
-            item=self.scene.selectedItems()
-            ids=[]
-            for i in items:
-                if i.type()==3:
-                    if i in item:
-                        ids.append(True)
-                    else:
-                        ids.append(False)
-            self.showInGraphview()
-            items2=self.scene.items()
-            item=[]
-            ids=ids[::-1]
-            for i in range(len(ids)):
-                if items2[i].type()==3:
-                    if ids[i]==True:
-                        items2[i].setSelected(True)
-                        item.append(items2[i])
-            if item==[]:
-                return()
-            else:
-                patterns=[]
-                for i in item:
-                    if i.type()==3:
-                        patterns.append([i.x,i.y,i.w,i.h])
-                self.copy=patterns
+        print("Patterns copied")
+        self.savePatterns()
+        items = self.scene.items()
+        item = self.scene.selectedItems()
+        ids = []
+        for i in items:
+            if i.type() == 3:
+                if i in item:
+                    ids.append(True)
+                else:
+                    ids.append(False)
+        self.showInGraphview()
+        items2 = self.scene.items()
+        item = []
+        ids = ids[::-1]
+        for i in range(len(ids)):
+            if items2[i].type() == 3:
+                if ids[i] == True:
+                    items2[i].setSelected(True)
+                    item.append(items2[i])
+        if item == []:
+            return ()
+        else:
+            patterns = []
+            for i in item:
+                if i.type() == 3:
+                    patterns.append([i.x, i.y, i.w, i.h])
+            self.copy = patterns
+
     def paste_patterns(self):
         print('paste_patterns')
         for i in self.copy:
-            scene=self.graphicsView.scene.addItem(Rectangle(i[0],i[1],i[2],i[3]))
-        return()
+            scene = self.graphicsView.scene.addItem(Rectangle(i[0], i[1], i[2], i[3]))
+        return ()
+
+
 ####################################
-#/CODE:Pattern handling Functions  #
+# /CODE:Pattern handling Functions  #
 ####################################
 class LamellaView(QtWidgets.QGraphicsView):
     leftMouseButtonPressed = pyqtSignal(float, float)
@@ -2263,153 +2356,174 @@ class LamellaView(QtWidgets.QGraphicsView):
     rightMouseButtonReleased = pyqtSignal(float, float)
     leftMouseButtonDoubleClicked = pyqtSignal(float, float)
     rightMouseButtonDoubleClicked = pyqtSignal(float, float)
-    def __init__(self,parent=None):
-        super(LamellaView,self).__init__(parent)
-        self.left_begin=[]
-        self.left_end=[]
-        self.lamella_rect=QtCore.QRectF()
+
+    def __init__(self, parent=None):
+        super(LamellaView, self).__init__(parent)
+        self.left_begin = []
+        self.left_end = []
+        self.lamella_rect = QtCore.QRectF()
         global ui
-        self.scene=ui.get_scene()
-        self.sceneBuffer=ui.get_scenebuffer()
-        self.number_imageBuffer=ui.get_number_imageBuffer()
-        #self.number_imageBuffer=1
-        self.pattern_dict=ui.get_pattern_dict()
+        self.scene = ui.get_scene()
+        self.sceneBuffer = ui.get_scenebuffer()
+        self.number_imageBuffer = ui.get_number_imageBuffer()
+        # self.number_imageBuffer=1
+        self.pattern_dict = ui.get_pattern_dict()
         self.setAcceptDrops(True)
+
     def mouseDoubleClickEvent(self, event):
         """ Show entire image.
         """
         scenePos = self.mapToScene(event.pos())
-        number=self.number_imageBuffer
+        number = self.number_imageBuffer
         if event.button() == QtCore.Qt.LeftButton:
             self.leftMouseButtonDoubleClicked.emit(scenePos.x(), scenePos.y())
-            #print("Left Double Clicked")
+            # print("Left Double Clicked")
         elif event.button() == QtCore.Qt.RightButton:
             self.rightMouseButtonDoubleClicked.emit(scenePos.x(), scenePos.y())
-            #print("Right Double Clicked",[scenePos.x(),scenePos.y()])
+            # print("Right Double Clicked",[scenePos.x(),scenePos.y()])
         QtWidgets.QGraphicsView.mouseDoubleClickEvent(self, event)
-        self.scene.addItem(Rectangle(0,0,100,100))
+        self.scene.addItem(Rectangle(0, 0, 100, 100))
         self.setScene(self.scene)
-        #self.sceneBuffer[0]=self.scene
-        self.number_imageBuffer=ui.get_number_imageBuffer()
-        #print(self.number_imageBuffer)
+        # self.sceneBuffer[0]=self.scene
+        self.number_imageBuffer = ui.get_number_imageBuffer()
+        # print(self.number_imageBuffer)
         try:
-            old_list=self.pattern_dict[self.number_imageBuffer]
-            #new_list=old_list.append(Rectangle(0,0,100,100))
+            old_list = self.pattern_dict[self.number_imageBuffer]
+            # new_list=old_list.append(Rectangle(0,0,100,100))
         except KeyError:
-            old_list=[]
-            #new_list=Rectangle(0,0,100,100)
-        self.pattern_dict.update({self.number_imageBuffer : old_list+[Rectangle(0,0,100,100)]})
+            old_list = []
+            # new_list=Rectangle(0,0,100,100)
+        self.pattern_dict.update({self.number_imageBuffer: old_list + [Rectangle(0, 0, 100, 100)]})
         ui.push_pattern_dict(self.pattern_dict)
+
     def keyPressEvent(self, e):
         if e.key() == QtCore.Qt.Key_F5:
             print("F5 pressed")
-            #QtCore.Qt.FramelessWindowHint
-            #print(self.parent())
+            # QtCore.Qt.FramelessWindowHint
+            # print(self.parent())
             ui.toggleFullScreen()
-            #self.showFullScreen()
-            #self.show()
+            # self.showFullScreen()
+            # self.show()
         if e.key() == QtCore.Qt.Key_F6:
             def y_pos(element):
-                return(element.y)
-            #print("Pattern size is:")
+                return (element.y)
+
+            # print("Pattern size is:")
             ui.savePatterns()
             ui.showInGraphview()
-            number=ui.ImageBufferHandle
-            image=ui.ImageBufferImages[int(number)]
-            pixel_size=image.metadata.binary_result.pixel_size
-            item=self.scene.items()
-            patterns=[]
+            number = ui.ImageBufferHandle
+            image = ui.ImageBufferImages[int(number)]
+            pixel_size = image.metadata.binary_result.pixel_size
+            item = self.scene.items()
+            patterns = []
             for i in item:
-                if i.type()==3:
+                if i.type() == 3:
                     patterns.append(i)
-                    #print(i.w)
-                    #if i==item_id:
+                    # print(i.w)
+                    # if i==item_id:
             patterns.sort(key=y_pos)
             for i in patterns:
-                print("Pattern Number "+str(patterns.index(i))+str(" is ")+str(i.w*pixel_size[0]*1000000)+" µm wide.")
-    def paintpoint(self,x,y):
-        #Painting Correlation Spots
-        point=QtCore.QPointF(x,y)
-        painter=QtGui.QPainter(self.viewport())
+                print("Pattern Number " + str(patterns.index(i)) + str(" is ") + str(
+                    i.w * pixel_size[0] * 1000000) + " µm wide.")
+
+    def paintpoint(self, x, y):
+        # Painting Correlation Spots
+        point = QtCore.QPointF(x, y)
+        painter = QtGui.QPainter(self.viewport())
         painter.setPen(QtGui.QPen(QtCore.Qt.green, 3000))
         painter.setBrush(QtGui.QBrush(QtCore.Qt.green, QtCore.Qt.CrossPattern))
         self.scene.addPoint(point)
+
+
 class CorrelationSpot(QtWidgets.QGraphicsPixmapItem):
-    def __init__(self,x,y):
+    def __init__(self, x, y):
         super(CorrelationSpot, self).__init__()
-        item=QtGui.QPixmap('../images/x.jpg')
-        self.setPos(x,y)
-        self.x=x
-        self.y=y
+        item = QtGui.QPixmap('../images/x.jpg')
+        self.setPos(x, y)
+        self.x = x
+        self.y = y
+
+
 class Rectangle(QtWidgets.QGraphicsRectItem):
     def __init__(self, x, y, w, h):
         super(Rectangle, self).__init__(0, 0, w, h)
         self.setPen(QtGui.QPen(QtCore.Qt.red, 2))
         self.setFlags(QtWidgets.QGraphicsItem.ItemIsSelectable
-            | QtWidgets.QGraphicsItem.ItemIsMovable
-            | QtWidgets.QGraphicsItem.ItemIsFocusable
-            | QtWidgets.QGraphicsItem.ItemSendsGeometryChanges
-            | QtWidgets.QGraphicsItem.ItemSendsScenePositionChanges)
+                      | QtWidgets.QGraphicsItem.ItemIsMovable
+                      | QtWidgets.QGraphicsItem.ItemIsFocusable
+                      | QtWidgets.QGraphicsItem.ItemSendsGeometryChanges
+                      | QtWidgets.QGraphicsItem.ItemSendsScenePositionChanges)
         self.setPos(QtCore.QPointF(x, y))
-        self.w=w
-        self.h=h
-        self.x=x
-        self.y=y
+        self.w = w
+        self.h = h
+        self.x = x
+        self.y = y
+
     def mouseMoveEvent(self, e):
         if e.buttons() & QtCore.Qt.LeftButton:
             super(Rectangle, self).mouseMoveEvent(e)
         if e.buttons() & QtCore.Qt.RightButton:
             self.setRect(QtCore.QRectF(QtCore.QPoint(), e.pos()).normalized())
+
+
 class Pattern():
-    def __init__(self,center_x,center_y,depth,width,height,scan_direction):
-        self.center_x=center_x
-        self.center_y=center_y
-        self.depth=depth
-        self.width=width
-        self.height=height
-        self.scan_direction=scan_direction
+    def __init__(self, center_x, center_y, depth, width, height, scan_direction):
+        self.center_x = center_x
+        self.center_y = center_y
+        self.depth = depth
+        self.width = width
+        self.height = height
+        self.scan_direction = scan_direction
+
+
 ####################################
 # CODE:Threads for mill running    #
 ####################################
 class RoughMillThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
+
     def run(self):
         try:
             ui.write_patterns()
-            row_count=ui.tableWidget.rowCount()
+            row_count = ui.tableWidget.rowCount()
             for i in range(row_count):
-                ui.log_out=''
-                if ui.tableWidget.item(i,7)==None:
-                    print("Skipping Position "+str(ui.tableWidget.item(i,0).text()))
+                ui.log_out = ''
+                if ui.tableWidget.item(i, 7) == None:
+                    print("Skipping Position " + str(ui.tableWidget.item(i, 0).text()))
                 else:
-                    label=ui.tableWidget.item(i,0).text()
-                    x=float(ui.tableWidget.item(i,1).text())
-                    y=float(ui.tableWidget.item(i,2).text())
-                    z=float(ui.tableWidget.item(i,3).text())
-                    r=float(ui.tableWidget.item(i,4).text())
-                    t=float(ui.tableWidget.item(i,5).text())
+                    label = ui.tableWidget.item(i, 0).text()
+                    x = float(ui.tableWidget.item(i, 1).text())
+                    y = float(ui.tableWidget.item(i, 2).text())
+                    z = float(ui.tableWidget.item(i, 3).text())
+                    r = float(ui.tableWidget.item(i, 4).text())
+                    t = float(ui.tableWidget.item(i, 5).text())
                     ui.sysout.write('---------------------------------------------------\n')
                     ui.sysout.write(str(label))
                     ui.sysout.write('\n---------------------------------------------------\n')
-                    stagepos={'label':label,'x':x,'y':y,'z':z,'t':t,'r':r}
-                    image_number=int(ui.tableWidget.item(i,6).text())
-                    alignment_image=ui.ImageBufferImages[image_number]
-                    pattern_dir=ui.output_dir+'/'+str(label)+'/'
-                    log_out_new=scope.run_rough_milling(label,alignment_image,stagepos,pattern_dir)
-                    ui.log_out=ui.log_out+log_out_new
+                    stagepos = {'label': label, 'x': x, 'y': y, 'z': z, 't': t, 'r': r}
+                    image_number = int(ui.tableWidget.item(i, 6).text())
+                    alignment_image = ui.ImageBufferImages[image_number]
+                    pattern_dir = ui.output_dir + '/' + str(label) + '/'
+                    log_out_new = scope.run_rough_milling(label, alignment_image, stagepos, pattern_dir)
+                    ui.log_out = ui.log_out + log_out_new
                 ui.sysout.write(ui.log_out)
             self.signal.emit("Rough Mill done!")
         except:
             print("Something went wrong. Most likely, your output directory is not valid!")
             print(sys.exc_info())
+
+
 class TrenchMillThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
+
     def run(self):
         try:
             ui.write_patterns()
@@ -2439,13 +2553,17 @@ class TrenchMillThread(QtCore.QThread):
         except:
             print("Something went wrong. Most likely, your output directory is not valid!")
             print(sys.exc_info())
+
+
 class RoughProtocolThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
         self.continuerun = True
         QtCore.QThread.__init__(self)
+
     def run(self):
         try:
             ui.write_patterns()
@@ -2471,7 +2589,7 @@ class RoughProtocolThread(QtCore.QThread):
                         pattern_dir = ui.output_dir + '/' + str(label) + '/'
                         protocolfile = ui.roughmillprotocol
                         log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir,
-                                                                 protocolfile,mode='rough')
+                                                                 protocolfile, mode='rough')
                         ui.log_out = ui.log_out + log_out_new
                     ui.sysout.write(ui.log_out)
             self.signal.emit("Rough Protocol done!")
@@ -2480,13 +2598,17 @@ class RoughProtocolThread(QtCore.QThread):
             print("Something went wrong. Most likely, your output directory is not valid!")
             print(sys.exc_info())
             ui.progressDialog.close()
+
+
 class FineProtocolThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
         QtCore.QThread.__init__(self)
-        self.continuerun=True
+        self.continuerun = True
+
     def run(self):
         try:
             ui.write_patterns()
@@ -2510,8 +2632,8 @@ class FineProtocolThread(QtCore.QThread):
                         image_number = int(ui.tableWidget.item(i, 6).text())
                         alignment_image = ui.ImageBufferImages[image_number]
                         pattern_dir = ui.output_dir + '/' + str(label) + '/'
-                        protocolfile=ui.finemillprotocol
-                        #protocolfile = ui.finemillprotocol
+                        protocolfile = ui.finemillprotocol
+                        # protocolfile = ui.finemillprotocol
                         log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir,
                                                                  protocolfile)
                         ui.log_out = ui.log_out + log_out_new
@@ -2524,16 +2646,21 @@ class FineProtocolThread(QtCore.QThread):
             print(sys.exc_info())
             self.quit()
             ui.progressDialog.close()
+
     def stop(self):
-        self.continuerun=False
-        return()
+        self.continuerun = False
+        return ()
+
+
 class VolumeImagingThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
         QtCore.QThread.__init__(self)
         self.continuerun = True
+
     def run(self):
         try:
             ui.write_patterns()
@@ -2569,12 +2696,16 @@ class VolumeImagingThread(QtCore.QThread):
             print(sys.exc_info())
             self.quit()
             ui.progressDialog.close()
+
+
 class CustomPatternfileThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
         self.continuerun = True
+
     def run(self):
         try:
             ui.write_patterns()
@@ -2604,7 +2735,7 @@ class CustomPatternfileThread(QtCore.QThread):
                         ui.log_out = ui.log_out + log_out_new
                     ui.sysout.write(ui.log_out)
             self.signal.emit("Custom Protocol done!")
-            #return True
+            # return True
             self.quit()
             ui.progressDialog.close()
         except:
@@ -2612,20 +2743,24 @@ class CustomPatternfileThread(QtCore.QThread):
             print(sys.exc_info())
             self.quit()
             ui.progressDialog.close()
+
+
 class WaffleMillThread(QtCore.QThread):
     signal = pyqtSignal('PyQt_PyObject')
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
-        self.continuerun = True        
+        self.continuerun = True
         self.step = 0
+
     def run(self):
-    # step == 0 --> writes patterns for trenches, notches and lamellae
-    # step == 1 --> mills trenches
-    # step == 2 --> mills notches
-    # step == 3 --> mills lamellae 
+        # step == 0 --> writes patterns for trenches, notches and lamellae
+        # step == 1 --> mills trenches
+        # step == 2 --> mills notches
+        # step == 3 --> mills lamellae
         try:
-            #ui.write_patterns()
+            # ui.write_patterns()
             if step == 0:
                 print('Writing patterns for trenches, notches and lamellae')
             elif step == 1:
@@ -2643,7 +2778,7 @@ class WaffleMillThread(QtCore.QThread):
                     if ui.tableWidget.item(i, 7) == None:
                         print("Skipping Position " + str(ui.tableWidget.item(i, 0).text()))
                     else:
-                        #write the patterns for the trenches
+                        # write the patterns for the trenches
                         label = ui.tableWidget.item(i, 0).text()
                         x = float(ui.tableWidget.item(i, 1).text())
                         y = float(ui.tableWidget.item(i, 2).text())
@@ -2662,25 +2797,28 @@ class WaffleMillThread(QtCore.QThread):
                             protocolfile = ui.patternfile_trench
                         elif 'notch' in pattern_type:
                             protocolfile = ui.patternfile_notch
-                            image_number = 0  #img_id0 = template for a readily milled trench from the lamella milling angle     
+                            image_number = 0  # img_id0 = template for a readily milled trench from the lamella milling angle
                         alignment_image = ui.ImageBufferImages[image_number]
-                        if step == 0:                            
-                            scope.write_patterns(label,patterns,alignment_image,output_dir)
+                        if step == 0:
+                            scope.write_patterns(label, patterns, alignment_image, output_dir)
                             if position_type == 'notch':
-                                alignment_image = ui.ImageBufferImages[1]                             
-                                scope.write_patterns(label,patterns,alignment_image,output_dir)#img_id1 = template for a readily milled notch
+                                alignment_image = ui.ImageBufferImages[1]
+                                scope.write_patterns(label, patterns, alignment_image,
+                                                     output_dir)  # img_id1 = template for a readily milled notch
                         elif step == 1:
-                            if 'trench' in pattern_type:                                                    
-                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir, protocolfile)
+                            if 'trench' in pattern_type:
+                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir,
+                                                                         protocolfile)
                         elif step == 2:
-                            if 'notch' in pattern_type:                                
-                                alignment_image = ui.ImageBufferImages[0]                                                       
-                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir, protocolfile)
+                            if 'notch' in pattern_type:
+                                alignment_image = ui.ImageBufferImages[0]
+                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir,
+                                                                         protocolfile)
                         elif step == 3:
-                            if 'notch' in pattern_type:                                
-                                alignment_image = ui.ImageBufferImages[1]                                                       
-                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir, protocolfile)
-
+                            if 'notch' in pattern_type:
+                                alignment_image = ui.ImageBufferImages[1]
+                                log_out_new = scope.run_milling_protocol(label, alignment_image, stagepos, pattern_dir,
+                                                                         protocolfile)
 
                         ui.log_out = ui.log_out + log_out_new
                     ui.sysout.write(ui.log_out)
@@ -2690,25 +2828,30 @@ class WaffleMillThread(QtCore.QThread):
             print("Something went wrong. Most likely, your output directory is not valid!")
             print(sys.exc_info())
             ui.progressDialog.close()
+
     def check_trench_notch(self):
         if 'trench' in label:
             position_type = 'trench'
-        elif 'notch' in label:      
+        elif 'notch' in label:
             position_type = 'notch'
         elif img_id % 2 == 1:
             position_type = 'notch'
-        elif img_id % 2 == 0:         
+        elif img_id % 2 == 0:
             position_type = 'trench'
-        return(position_type)
+        return (position_type)
+
     class CustomProtocolThread(QtCore.QThread):
         signal = pyqtSignal('PyQt_PyObject')
+
     global ui
+
     def __init__(self):
         QtCore.QThread.__init__(self)
         self.continuerun = True
+
     def run(self):
         try:
-            ui.write_patterns() #write the top, center and bottom rectangles from alignment
+            ui.write_patterns()  # write the top, center and bottom rectangles from alignment
             row_count = ui.tableWidget.rowCount()
             for i in range(row_count):
                 if self.continuerun:
@@ -2740,11 +2883,14 @@ class WaffleMillThread(QtCore.QThread):
             print("Something went wrong. Most likely, your output directory is not valid!")
             print(sys.exc_info())
             ui.progressDialog.close()
+
+
 ####################################
-#/CODE:Threads for mill running    #
+# /CODE:Threads for mill running    #
 ####################################
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
