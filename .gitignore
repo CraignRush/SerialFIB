@@ -18,5 +18,5 @@ src/Zeiss/.ipynb_checkpoints
 SFIB.log
 client.log
 SFIB.log
-.idea/
+.idea
 *.pyc
