@@ -31,8 +31,8 @@ CODEC = 'base64_codec'
 SAVE_DEBUGGING_IMAGES = False
 ROUGH_FOCUS_POS = 10.5e-3  # focus pos in m
 EMISSION_RAD = (0.08, 0.865398, 1.650796, 2.4361944)
-EMISSION = {'green': 0, 'ref': 3, 'orange': 2, 'red': 1}
-EXCITATION = {'UV': 0, 'cyan': 1, 'green': 2, 'red': 3}
+EMISSION = {'green': 0, 'ref': 1, 'orange': 2, 'red': 3} # Filter positions{'green': 2, 'ref': 3, 'orange': 1, 'red': 0} # Filter positions
+EXCITATION = {'UV': 3, 'cyan': 2, 'green': 1, 'red': 0} # Lumencor parameters.
 CAMERA = {'name': 'Camera',
           'role': 'ccd',
           #        device: null, # Any one found will do, otherwise, put the serial number

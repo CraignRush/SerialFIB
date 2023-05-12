@@ -838,7 +838,7 @@ class Ui_MainWindow(object):
     def display_image_in_scene(self, img):
         if len(img.shape) == 3:            
             self.Slider_StackSelector.setMaximum(img.shape[2])
-            array = np.uint8(img[:,:,self.Slider_StackSelector.value()].data)
+            array = np.uint16(img[:,:,self.Slider_StackSelector.value()].data)
             self.Slider_StackSelector.setMaximum(img.shape[2]-1)
             #print("Slice selected:{}".format(self.Slider_StackSelector.value()))
         elif len(img.shape) == 4:            
