@@ -46,3 +46,4 @@ finally:
     # --- close socket ---
     logger_server.exception('close socket')
     s.close()
+    METEOR.disconnect()

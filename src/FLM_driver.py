@@ -319,7 +319,7 @@ class FLM():  # ,CAMERA_CONFIG):
         self.focus_set_abs(focusPos)
         pos = self.focus_get_position()['z']
         stack = np.zeros(
-            (self.pixel_count['x'], self.pixel_count['y'], slices), dtype='uint16')
+            (self.pixel_count[0], self.pixel_count[1], slices), dtype='uint16')
 
         try:
             for slice in range(slices):
@@ -398,10 +398,10 @@ class FLM():  # ,CAMERA_CONFIG):
             # this is not urgently neccesarry but for later other formats such as ome-tiff
             if format == 'TZCYX':
                 constack = np.zeros(
-                        (1, slices, filters.__len__(), self.pixel_count['y'], self.pixel_count['x']), dtype='uint16')
+                        (1, slices, filters.__len__(), self.pixel_count[1], self.pixel_count[0]), dtype='uint16')
             elif format == 'XYZ':
                 constack = np.zeros(
-                    (self.pixel_count['x'], self.pixel_count['y'], slices), dtype='uint16')
+                    (self.pixel_count[0], self.pixel_count[1], slices), dtype='uint16')
             else:
                 raise Exception(
                     "Unsupported Stack Format, only XYZ and TZCYX...")
@@ -685,13 +685,13 @@ class FLM():  # ,CAMERA_CONFIG):
             dictf = self.autofocus_result
         slices = int(stackrange/step)
         constack = np.zeros(
-            (1, slices, 1, self.pixel_count['y'], self.pixel_count['x']), dtype='uint16')
+            (1, slices, 1, self.pixel_count[1], self.pixel_count[0]), dtype='uint16')
 
         stack = self.get_raw_stack(stackrange, step, focusPos=dictf)
         constack[0, :, 0, :, :] = np.transpose(
             stack, axes=(2, 1, 0))  # transpose stack from XYZ to ZYX
 
-        if SAVE_DEBUGGING_IMAGES:
+        if config.SAVE_DEBUGGING_IMAGES:
             filename = os.path.join(os.getcwd(), datetime.datetime.now().strftime(
                 "%y_%m_%d-%H_%M_%S") + ".tiff")
             self.save_stack_imagej(constack, filename, z_distance=step)

@@ -36,7 +36,7 @@ def get_image_stack(METEOR: FLM, stack_length: float, stack_step: float):
         stack = np.concatenate((stack,np.expand_dims(rotate(img,90,reshape=False),0)))      
         stack = np.concatenate((stack,np.expand_dims(rotate(img,-90,reshape=False),0)))
     else:   
-        stack= np.array(METEOR.start_acquistion(stack_length,stack_step),dtype='uint16').copy(order='C')
+        stack= np.array(METEOR.start_acquisition(stack_length,stack_step),dtype='uint16').copy(order='C')
         #stack = METEOR.testStack2(2,1)
     return stack
 
