@@ -1,0 +1,51 @@
+{
+    "channels": {
+        "green": {
+            "intensity": 200,
+            "exposure_time": 300},
+        "orange": {
+            "intensity": 200,
+            "exposure_time": 300},
+        "red": {
+            "intensity": 200,
+            "exposure_time": 300},
+        "reflection": {
+            "intensity": 200,
+            "exposure_time": 300
+        },
+        "uv": {
+            "intensity": 200,
+            "exposure_time": 300
+        }
+    },
+    "config": {
+        "autofocus_coarse_range": 600e-6,
+        "autofocus_coarse_step": 20e-6,
+        "autofocus_fine_range": 50e-6,
+        "autofocus_fine_step": 1e-6,
+        "autofocus_start_pos": 15.6e-3,
+        "focus_safe_pos": 9.3e-3
+    },
+    "FLM_params": {
+        "emission_positions": {
+            "green": 0,
+            "orange": 2,
+            "red": 3,
+            "ref": 1
+        },
+        "emission_rad": [
+            0.08,
+            0.865398,
+            1.650796,
+            2.4361944
+        ],
+        "excitation_positions": {
+            "cyan": 1,
+            "green": 2,
+            "red": 3,
+            "UV": 0
+        },
+        "network_locator": "network:sn:MCS2-00003632",
+        "pixel_size": 4.107142857142857e-02
+    }
+}

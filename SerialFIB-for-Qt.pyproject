@@ -1,0 +1,28 @@
+{
+    "files": [
+        "20210428_SerialFIB_Tutorial.pdf",
+        "LICENSE",
+        "README.md",
+        "SAV_pattern_file.pf",
+        "SAVparams.spf",
+        "SFIB.log",
+        "SerialFIB copy.py",
+        "SerialFIB-for-Qt.pyproject",
+        "SerialFIB-for-Qt.pyproject.user",
+        "SerialFIB.py",
+        "SerialFIB_Zeiss.py",
+        "finemill.pro",
+        "patternfile.pf",
+        "patternfile_from_protocol.pf",
+        "pickle.tmp",
+        "roughmill.pro",
+        "session1.sfs",
+        "src/FLM_adjustment_tool.py",
+        "standard.settings",
+        "testprotocol.pro",
+        "tmp.log",
+        "tmp.py",
+        "unittest_CustomMill.pf",
+        "unittest_LamellaDesigner.pf"
+    ]
+}
