@@ -50,6 +50,7 @@ from src.scripteditor import Ui_ScriptEditor
 from src.PatternDesigner import Ui_PatternFileEditor
 from src.LamellaDesigner import Ui_LamellaDesigner
 from src.VolumeDesigner import Ui_VolumeDesigner
+from src.ui.FLM_helper import Ui_FLM_helper
 from src.Param3D import Param3D
 
 ### INITIALIZE MICROSCOPE FROM DRIVER
@@ -74,8 +75,7 @@ import sys
 import pickle
 import src.project_3dct as project_3dct
 import re
-
-
+import json
 ###
 class Stream(QtCore.QObject):
     '''
@@ -136,6 +136,8 @@ class Ui_MainWindow(object):
         self.settings = r'./standard.settings'
         self.patternfile_trench = r'./ScriptingExamples/FilesForWaffleDev/Trenches.pf'
         self.patternfile_notch = r'./ScriptingExamples/FilesForWaffleDev/Notch.pf'
+        self.FLM_config_file=r'./FLM_params.json'
+
         self.number = 0
         self.threads = []
         # Logfile initialization
@@ -149,6 +151,32 @@ class Ui_MainWindow(object):
         self.colordict = {"green": [0, 255, 0], "magenta": [255, 0, 255], "cyan": [0, 255, 255],
                           "yellow": [255, 255, 0], "red": [255, 0, 0], "white": [255, 255, 255]}
         self.CFproj = None
+        self.__init_FLM_helper__()
+
+    def __init_FLM_helper__(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.FLM_helper = Ui_FLM_helper()
+        self.SubWindow_FLM_helper = QtWidgets.QWidget()
+        self.FLM_helper.setupUi(self.SubWindow_FLM_helper)
+        self.FLM_helper.Slider_SliceSelector.valueChanged.connect(self.on_slice_slider_change)
+
+
+        self.brightness = (self.FLM_helper.Slider_Brightness.value() - 50) * 2.55
+        self.contrast = self.FLM_helper.Slider_Contrast.value() / 10
+        self.FLM_helper.Slider_Brightness.valueChanged.connect(self.on_brightness_contrast_change)
+        self.FLM_helper.Slider_Contrast.valueChanged.connect(self.on_brightness_contrast_change)
+
+        self.FLM_helper.FluoChannels.insertWidget(self.FLM_helper.FluoChannels.count() -1,self.FLM_helper.CheckBox_FluoChannel3)
+        self.FLM_helper.FluoChannels.insertWidget(self.FLM_helper.FluoChannels.count() -1,self.FLM_helper.CheckBox_FluoChannel4)
+        self.FLM_helper.FluoChannels.insertWidget(self.FLM_helper.FluoChannels.count() -1,self.FLM_helper.CheckBox_FluoChannel5)
+        self.FLM_helper.CheckBox_FluoChannel1.toggled.connect(self.redraw_current_display_img)
+        self.FLM_helper.CheckBox_FluoChannel2.toggled.connect(self.redraw_current_display_img)
+        self.FLM_helper.CheckBox_FluoChannel3.toggled.connect(self.redraw_current_display_img)
+        self.FLM_helper.CheckBox_FluoChannel4.toggled.connect(self.redraw_current_display_img)
+        self.FLM_helper.CheckBox_FluoChannel5.toggled.connect(self.redraw_current_display_img)
+        self.FLM_helper.PushButton_MIP.toggled.connect(self.redraw_current_display_img)
+
+        self.SubWindow_FLM_helper.show()
 
     def get_scene(self):
         '''
@@ -366,9 +394,6 @@ class Ui_MainWindow(object):
         self.Button_RunCustomPatternfile = QtWidgets.QPushButton(self.verticalLayoutWidget_2)
         self.Button_RunCustomPatternfile.setObjectName("Button_RunCustomPatternfile")
         self.verticalLayout_2.addWidget(self.Button_RunCustomPatternfile)
-        self.Slider_StackSelector = QtWidgets.QSlider(0x1, self.verticalLayoutWidget_2)
-        self.Slider_StackSelector.setObjectName("Slider_StackSelector")
-        self.verticalLayout_2.addWidget(self.Slider_StackSelector)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1070, 22))
@@ -381,8 +406,8 @@ class Ui_MainWindow(object):
         self.menuCorrelation.setObjectName("menuCorrelation")
         self.menuTesting = QtWidgets.QMenu(self.menubar)
         self.menuTesting.setObjectName("menuTesting")
-        self.menuMeteor = QtWidgets.QMenu(self.menubar)
-        self.menuMeteor.setObjectName("menuMeteor")
+        self.menuFLM = QtWidgets.QMenu(self.menubar)
+        self.menuFLM.setObjectName("menuFLM")
         self.menuSettings = QtWidgets.QMenu(self.menubar)
         self.menuSettings.setObjectName("menuSettings")
         MainWindow.setMenuBar(self.menubar)
@@ -444,24 +469,19 @@ class Ui_MainWindow(object):
         self.actionSet_Custom_Milling = QtWidgets.QAction(MainWindow)
         self.actionSet_Custom_Milling.setObjectName("actionSet_Custom_Milling")
         self.actionSet_Trench_Milling = QtWidgets.QAction(MainWindow)
-        self.actionSet_Trench_Milling.setObjectName("actionSet_Trench_Milling")
+        self.actionSet_Trench_Milling.setObjectName("actionSet_Trench_Milling")        
         self.actionSet_Notch_Milling = QtWidgets.QAction(MainWindow)
         self.actionSet_Notch_Milling.setObjectName("actionSet_Notch_Milling")
-        self.actionSet_Meteor_Move_To = QtWidgets.QAction(MainWindow)
-        self.actionSet_Meteor_Move_To.setObjectName("actionSet_Meteor_Move_To")
-        self.menuMeteor.addAction(self.actionSet_Meteor_Move_To)
-        self.actionSet_Meteor_Move_From = QtWidgets.QAction(MainWindow)
-        self.actionSet_Meteor_Move_From.setObjectName("actionSet_Meteor_Move_From")
-        self.menuMeteor.addAction(self.actionSet_Meteor_Move_From)
-        self.actionSet_Meteor_GetRotationCenter = QtWidgets.QAction(MainWindow)
-        self.actionSet_Meteor_GetRotationCenter.setObjectName("actionSet_Meteor_Get_Rotation_Center")
-        self.menuMeteor.addAction(self.actionSet_Meteor_GetRotationCenter)
-        self.actionSet_Meteor_Acquire_Stack = QtWidgets.QAction(MainWindow)
-        self.actionSet_Meteor_Acquire_Stack.setObjectName("actionSet_Meteor_Acquire_Stack")
-        self.menuMeteor.addAction(self.actionSet_Meteor_Acquire_Stack)
-        self.actionSet_Load_Stack = QtWidgets.QAction(MainWindow)
-        self.actionSet_Load_Stack.setObjectName("actionSet_Meteor_Load_Stack")
-        self.menuMeteor.addAction(self.actionSet_Load_Stack)
+        self.actionCalibrate_Pos_manually = QtWidgets.QAction(MainWindow)
+        self.actionCalibrate_Pos_manually.setObjectName("actionCalibrate_Pos_manually")
+        self.actionCalibrate_Pos_automatically = QtWidgets.QAction(MainWindow)
+        self.actionCalibrate_Pos_automatically.setObjectName("actionCalibrate_Pos_automatically")
+        self.actionGoto_FLM = QtWidgets.QAction(MainWindow)
+        self.actionGoto_FLM.setObjectName("actionGoto_FLM")
+        self.actionGoto_SEM = QtWidgets.QAction(MainWindow)
+        self.actionGoto_SEM.setObjectName("actionGoto_SEM")
+        self.actionLoad_Test_Stack = QtWidgets.QAction(MainWindow)
+        self.actionLoad_Test_Stack.setObjectName("actionLoad_Test_Stack")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave_Session)
         self.menuFile.addAction(self.actionLoad_Session)
@@ -483,18 +503,24 @@ class Ui_MainWindow(object):
         self.menuSettings.addAction(self.actionSet_SAV_parameters)
         self.menuSettings.addAction(self.actionSet_Rough_Mill_protocol)
         self.menuSettings.addAction(self.actionSet_Fine_Mill_protocol)
-        self.menuSettings.addAction(self.actionSet_Custom_Protocol)
-        self.menuSettings.addAction(self.actionSet_Custom_Milling)
-        self.subMenu_Waffle = self.menuSettings.addMenu("Waffle")
+        self.menuSettings.addAction(self.actionSet_Custom_Protocol)        
+        self.menuSettings.addAction(self.actionSet_Custom_Milling)     
+        self.subMenu_Waffle = self.menuSettings.addMenu("Waffle")            
         self.subMenu_Waffle.addAction(self.actionSet_Trench_Milling)
-        self.subMenu_Waffle.addAction(self.actionSet_Notch_Milling)
+        self.subMenu_Waffle.addAction(self.actionSet_Notch_Milling)        
+        self.menuFLM.addAction(self.actionCalibrate_Pos_manually)
+        self.menuFLM.addAction(self.actionCalibrate_Pos_automatically)
+        self.menuFLM.addAction(self.actionGoto_FLM)
+        self.menuFLM.addAction(self.actionGoto_SEM)
+        self.menuFLM.addAction(self.actionLoad_Test_Stack)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
         self.menubar.addAction(self.menuCorrelation.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
         self.menubar.addAction(self.menuTesting.menuAction())
-        self.menubar.addAction(self.menuMeteor.menuAction())
-        # self.actionTestbutton3.triggered.connect(self.roughprotocol)
+        #self.actionTestbutton3.triggered.connect(self.roughprotocol)        
+        self.menubar.addAction(self.menuFLM.menuAction())
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -519,9 +545,9 @@ class Ui_MainWindow(object):
         self.Button_RunRoughProtocol.setText(_translate("MainWindow", "Run Rough Protocol"))
         self.Button_RunFineProtocol.setText(_translate("MainWindow", "Run Fine Protocol"))
         self.Button_RunTrenchMilling.setText(_translate("MainWindow", "Run Trench Milling"))
-        # self.Button_RunRoughMilling.setText(_translate("MainWindow", "Run Rough Milling"))
-        # self.Button_RunFineMilling.setText(_translate("MainWindow", "Run Fine Milling"))
-        self.Button_LoadCorrelationImages.setText(_translate("MainWindow", "Load Correlation Images"))
+        #self.Button_RunRoughMilling.setText(_translate("MainWindow", "Run Rough Milling"))
+        #self.Button_RunFineMilling.setText(_translate("MainWindow", "Run Fine Milling"))
+        self.Button_LoadCorrelationImages.setText(_translate("MainWindow", "Load Correlation Images"))        
         self.Button_RunWaffleMilling.setText(_translate("MainWindow", "Run Waffle Milling"))
         self.label_3.setText(_translate("MainWindow", "Alignment Image"))
         item = self.tableWidget.horizontalHeaderItem(0)
@@ -554,13 +580,13 @@ class Ui_MainWindow(object):
         self.Button_SetSAVparameters.setText(_translate("MainWindow", "Set SAV parameters"))
         self.Button_RunVolumeImaging.setText(_translate("MainWindow", "Run Volume Imaging"))
         self.Button_RunCustomProtocol.setText(_translate("MainWindow", "Run Custom Protocol"))
-        self.Button_RunCustomPatternfile.setText(_translate("MainWindow", "Run Custom Patternfile"))
+        self.Button_RunCustomPatternfile.setText(_translate("MainWindow", "Run Custom Patternfile"))   
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuTools.setTitle(_translate("MainWindow", "Tools"))
         self.menuCorrelation.setTitle(_translate("MainWindow", "Correlation"))
         self.menuTesting.setTitle(_translate("MainWindow", "Testing"))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
-        self.menuMeteor.setTitle(_translate("MainWindow", "METEOR"))
+        self.menuFLM.setTitle(_translate("MainWindow", "FLM"))
         self.actionOpen.setText(_translate("MainWindow", "Open New"))
         self.actionClose.setText(_translate("MainWindow", "Close"))
         self.actionSave_Session.setText(_translate("MainWindow", "Save Session"))
@@ -589,16 +615,17 @@ class Ui_MainWindow(object):
         self.actionSet_Custom_Protocol.setText(_translate("MainWindow", "Set Custom Protocol"))
         self.actionSet_Custom_Milling.setText(_translate("MainWindow", "Set Custom Milling"))
         self.subMenu_Waffle.setTitle(_translate("MainWindow", "Waffle"))
-        self.actionSet_Notch_Milling.setText(_translate("MainWindow", "Set Notch Pattern"))
+        self.actionSet_Notch_Milling.setText(_translate("MainWindow", "Set Notch Pattern"))        
         self.actionSet_Trench_Milling.setText(_translate("MainWindow", "Set Trench Pattern"))
-        self.actionSet_Meteor_Move_From.setText(_translate("MainWindow", "Move away"))
-        self.actionSet_Meteor_Move_To.setText(_translate("MainWindow", "Move To"))
-        self.actionSet_Meteor_GetRotationCenter.setText(_translate("MainWindow", "Calibrate Rot Center"))
-        self.actionSet_Meteor_Acquire_Stack.setText(_translate("MainWindow", "Acquire Stack"))
-        self.actionSet_Load_Stack.setText(_translate("MainWindow", "Debug: Load Stack"))
-        ##################################
-        ####  BUTTON DEFINITIONS #########
-        ##################################
+        self.actionCalibrate_Pos_manually.setText(_translate("MainWindow", "Calibrate Pos manually"))
+        self.actionCalibrate_Pos_automatically.setText(_translate("MainWindow", "Calibrate Pos automatically"))
+        self.actionGoto_FLM.setText(_translate("MainWindow", "Goto FLM"))
+        self.actionGoto_SEM.setText(_translate("MainWindow", "Goto FIBSEM"))
+        self.actionLoad_Test_Stack.setText(_translate("MainWindow", "Load Test Stack"))
+
+##################################
+####  BUTTON DEFINITIONS #########
+##################################
         # Testcase defintion
         self.testCase = False
         self.ktest = 0
@@ -669,10 +696,6 @@ class Ui_MainWindow(object):
         self.Button_RunCustomProtocol.pressed.connect(self.customprotocol)
         self.Button_RunTrenchMilling.pressed.connect(self.trenchmill)
         self.Button_RunCustomPatternfile.pressed.connect(self.custompatternfilerun)
-        # Slider for stack looping
-        self.Slider_StackSelector.setTickPosition(QtWidgets.QSlider.TicksBelow)
-        self.Slider_StackSelector.valueChanged.connect(self.update_stack)
-        self.Slider_StackSelector.setRange(0, 2)
         '''
         File Tab
         '''
@@ -708,19 +731,18 @@ class Ui_MainWindow(object):
         self.actionSet_Rough_Mill_protocol.triggered.connect(self.define_roughmillprotocol)
         self.actionSet_Fine_Mill_protocol.triggered.connect(self.define_finemillprotocol)
         self.actionSet_Custom_Protocol.triggered.connect(self.define_custommillprotocol)
-        self.actionSet_Custom_Milling.triggered.connect(self.define_custompatternfile)
-        self.actionSet_Trench_Milling.triggered.connect(self.define_patternfile_trench)
+        self.actionSet_Custom_Milling.triggered.connect(self.define_custompatternfile)        
+        self.actionSet_Trench_Milling.triggered.connect(self.define_patternfile_trench)        
         self.actionSet_Notch_Milling.triggered.connect(self.define_patternfile_notch)
         self.actionSaveSettings.triggered.connect(self.save_settings)
         self.actionLoadSettings.triggered.connect(self.load_settings)
         '''
-        METEOR Tab
+        FLM Tab
         '''
-        self.actionSet_Meteor_Move_From.triggered.connect(self.meteor_move_from)
-        self.actionSet_Meteor_Move_To.triggered.connect(self.meteor_move_to)
-        self.actionSet_Meteor_GetRotationCenter.triggered.connect(self.meteor_calibrate_rotation)
-        self.actionSet_Meteor_Acquire_Stack.triggered.connect(self.meteor_acquire_dummy_stack)
-        self.actionSet_Load_Stack.triggered.connect(self.load_stack)
+        self.actionGoto_SEM.triggered.connect(self.FLM_move_to_SEM)
+        self.actionGoto_FLM.triggered.connect(self.FLM_move_to_FLM)
+        self.actionCalibrate_Pos_manually.triggered.connect(self.FLM_calibrate_transformation_manually)
+        self.actionLoad_Test_Stack.triggered.connect(self.load_stack)
         '''
         TestButtons
         '''
@@ -731,68 +753,143 @@ class Ui_MainWindow(object):
         #### Graphics Viewer
         self.graphicsView.aspectRatioMode = QtCore.Qt.KeepAspectRatio
 
+
     # CODE:Meteor Moves      #
 
     ##################################
 
-    def meteor_move_to(self):
-        scope.move_to_METEOR(scope.getStagePosition())
+    def FLM_move_to_FLM(self):
+        #scope.move_to_METEOR(scope.getStagePosition())
         return
 
-    def meteor_move_from(self):
+    def FLM_move_to_SEM(self):
         scope.move_from_METEOR()
         return
 
-    def meteor_calibrate_rotation(self):
-        # implement
-        scope.find_rotation_center()
+    def FLM_load_config(self):
+        """
+        Reads data from a JSON file and returns it as a dictionary.
+
+        Args:
+        file_path (str): The path to the JSON file.
+
+        Returns:
+        dict: The data stored in the JSON file as a dictionary.
+        """
+        self.__FLM_read_config(self.FLM_config_file)
+
+    def FLM_calibrate_transformation_manually(self):
+        #implement
+        #scope.find_rotation_center()
         return
 
-    def update_stack(self, value):
-        ## Set the new slicer here
-        # print(self.ImageBufferImages.currentItem.data)
-        self.display_image_in_scene(self.ImageBufferImages[self.ImageBuffer.currentRow()])
-        pass
+    def on_slice_slider_change(self, value=None):
+        if self.FLM_helper.PushButton_MIP.isChecked():
+            self.FLM_helper.PushButton_MIP.setChecked(False)
+            # no need to call redraw here due to connected toggle signal of MIP
+        else:
+            self.redraw_current_display_img()
+
+
+    def __FLM_read_config(self,file_path="./FLM_params.json"):
+        """
+        Reads data from a JSON file and returns it as a dictionary.
+
+        Args:
+        file_path (str): The path to the JSON file.
+
+        Returns:
+        dict: The data stored in the JSON file as a dictionary.
+        """
+        try:
+            with open(file_path, 'r') as json_file:
+                data = json.load(json_file)
+            if isinstance(data, dict):
+                return data
+            else:
+                print("Error: JSON data is not a dictionary.")
+                return None
+        except FileNotFoundError:
+            print("Error: File not found at {file_path}.")
+            return None
+        except json.JSONDecodeError:
+            print("Error: Invalid JSON data in {file_path}.")
+            return None
+
+    def __FLM_write_config(self,data, file_path="./FLM_params.json"):
+        """
+        Writes data from a dictionary to a JSON file.
+
+        Args:
+        data (dict): The data to be written to the JSON file.
+        file_path (str): The path to the JSON file where data will be saved.
+
+        Returns:
+        bool: True if the data was successfully written, False otherwise.
+        """
+        try:
+            with open(file_path, 'w') as json_file:
+                json.dump(data, json_file, indent=4)
+            return True
+        except Exception as e:
+            print("Error: Failed to write JSON data to {file_path}.")
+            print("Exception: {str(e)}")
+            return False
+
+    def redraw_current_display_img(self,changed=None):
+        try:
+            img = self.ImageBufferImages[self.ImageBuffer.currentRow()]
+        except:
+            img = np.zeros([512,512,2])
+            print('No image found. inserting dummy.')
+        self.display_image_in_scene(img)
 
     def load_stack(self):
         from skimage import io
-        projfile = QtWidgets.QFileDialog.getOpenFileNames(None, "Fluorescence Stack", self.output_dir,
-                                                          "Images (*.tif; *.tiff)")
+        projfile=QtWidgets.QFileDialog.getOpenFileNames(None, "Fluorescence Stack",self.output_dir,"Images (*.tif; *.tiff)")
         if projfile == ('', ''):
-            return
+                return
         try:
             img = io.imread(projfile[0][0], plugin="tifffile")
             print(img.shape)
             numRows = self.ImageBuffer.count()
             self.ImageBuffer.addItem(str(numRows) + " (Image Stack)")
             self.ImageBuffer.setCurrentRow(numRows)
-            self.ImageBufferImages.append(img)
+            self.ImageBufferImages.append(img)            
             self.display_image_in_scene(img)
             # New Image cannot have fluorescence information, thus set checkBox to false
             self.checkBox_fluo.setChecked(False)
             # Adjust ImageBufferHandle to new Image
-            self.ImageBufferHandle = self.ImageBuffer.count() + 1
+            self.ImageBufferHandle=self.ImageBuffer.count()+1            
+            self.show_FLM_helper_window()
         except:
             print("Incorrect file selected")
             print(sys.exc_info())
         return
 
-    def meteor_acquire_dummy_stack(self):
-        from src.FLM_client import Client
-        c = Client()
-        stack = c.execute_TEST()
-        stack = np.transpose(stack[0, :, 0, :, :], axes=(2, 1, 0))
-        numRows = self.ImageBuffer.count()
-        self.ImageBuffer.addItem(str(numRows) + " (Image Stack)")
-        self.ImageBuffer.setCurrentRow(numRows)
-        self.ImageBufferImages.append(stack)
-        ## somehow the conversion is wrong
-        self.display_image_in_scene(stack)
-        # New Image cannot have fluorescence information, thus set checkBox to false
-        self.checkBox_fluo.setChecked(False)
-        # Adjust ImageBufferHandle to new Image
-        self.ImageBufferHandle = self.ImageBuffer.count() + 1
-        return
+    def show_FLM_helper_window(self):
+        img_shape = np.shape(self.ImageBufferImages[self.ImageBuffer.currentRow()].data)
+        print(img_shape)
+        self.FLM_helper.CheckBox_FluoChannel1.setEnabled(False)
+        self.FLM_helper.CheckBox_FluoChannel2.setEnabled(False)
+        self.FLM_helper.CheckBox_FluoChannel3.setEnabled(False)
+        self.FLM_helper.CheckBox_FluoChannel4.setEnabled(False)
+        self.FLM_helper.CheckBox_FluoChannel5.setEnabled(False)
+        if len(img_shape) == 3:
+            pass
+        elif len(img_shape) == 4:
+            print(img_shape[3])
+            if img_shape[3] >= 1:
+                self.FLM_helper.CheckBox_FluoChannel1.setEnabled(True)
+            if img_shape[3] >= 2:
+                self.FLM_helper.CheckBox_FluoChannel2.setEnabled(True)
+            if img_shape[3] >= 3:
+                self.FLM_helper.CheckBox_FluoChannel3.setEnabled(True)
+            if img_shape[3] >= 4:
+                self.FLM_helper.CheckBox_FluoChannel4.setEnabled(True)
+            if img_shape[3] >= 5:
+                self.FLM_helper.CheckBox_FluoChannel5.setEnabled(True)
+        self.SubWindow_FLM_helper.show()
 
     ##################################
     # CODE:Button_take_image_IB      #
@@ -840,65 +937,97 @@ class Ui_MainWindow(object):
         # New Image cannot have fluorescence information, thus set checkBox to false
         self.checkBox_fluo.setChecked(False)
         # Adjust ImageBufferHandle to new Image
-        self.ImageBufferHandle = self.ImageBuffer.count() + 1
-        return ()
+        self.ImageBufferHandle=self.ImageBuffer.count()+1
+        return()
+
+    def on_brightness_contrast_change(self):
+        self.brightness = (self.FLM_helper.Slider_Brightness.value() - 50) * 2.55
+        self.contrast = self.FLM_helper.Slider_Contrast.value() / 10
+        self.redraw_current_display_img()
+
 
     def display_image_in_scene(self, img):
-        if len(img.shape) == 3:
-            self.Slider_StackSelector.setMaximum(img.shape[2])
-            array = np.uint16(img[:,:,self.Slider_StackSelector.value()].data)
-            self.Slider_StackSelector.setMaximum(img.shape[2]-1)
+        if len(img.shape) == 3:            
+            self.FLM_helper.Slider_SliceSelector.setMaximum(img.shape[2])
+            array = np.uint8(img[:,:,self.FLM_helper.Slider_SliceSelector.value()].data)
+            self.FLM_helper.Slider_SliceSelector.setMaximum(img.shape[2]-1)
             #print("Slice selected:{}".format(self.Slider_StackSelector.value()))
         elif len(img.shape) == 4:            
-            self.Slider_StackSelector.setMaximum(img.shape[0]-1)
+            self.FLM_helper.Slider_SliceSelector.setMaximum(img.shape[0]-1)
             #print('Multichannel image selected')
-            slice = self.Slider_StackSelector.value()
+            slice = self.FLM_helper.Slider_SliceSelector.value()
             channel = 0
             array_lut = np.array([])
+            array_sum = np.zeros((3,img.shape[1],img.shape[2]),np.uint8)
             clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-            colors = (
-            'green', 'red', 'white', 'magenta', 'cyan', 'yellow')  # need to do because dicts are unordered in 3.5.2
+            colors = ('green', 'red', 'white', 'magenta', 'cyan', 'yellow') #need to do because dicts are unordered in 3.5.2
             for i in range(img.shape[3]):
-                # local contrast enhancement                
-                array_norm = clahe.apply(img[slice, :, :, channel])
-                # create lut
-                projColor = np.array(self.colordict[colors[i]], dtype=np.uint8)
-                scale = np.array([i / 256.0 for i in range(0, 256)]).clip(0,
-                                                                          1)  # a little brightness,contrast enhancement
-                LUT = np.tile(projColor, [1, 256])
-                LUT = np.array([np.round(LUT[:, i] * scale) for i in range(3)], dtype=np.uint8)
-                array_norm_lut = np.array([cv2.LUT(array_norm, LUT[i, :]) for i in range(3)])
-                # the next three lines slow the slice-sweeping a little down. Consider optimizing
-                # array_normalized = cv2.normalize(array_unnormalized, None, alpha=0, beta=1.2, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-                # array_normalized = np.clip(array_normalized, 0, 1)
-                # array_normalized = (255*array_normalized).astype(np.uint8)
-                channel = channel + 1
                 if i == 0:
-                    array_sum = array_norm_lut
+                    if not self.FLM_helper.CheckBox_FluoChannel1.isChecked():
+                        channel = channel + 1
+                        continue
+                elif i == 1:
+                    if not self.FLM_helper.CheckBox_FluoChannel2.isChecked():
+                        channel = channel + 1
+                        continue
+                elif i == 2:
+                    if not self.FLM_helper.CheckBox_FluoChannel3.isChecked():
+                        channel = channel + 1
+                        continue
+                elif i == 3:
+                    if not self.FLM_helper.CheckBox_FluoChannel4.isChecked():
+                        channel = channel + 1
+                        continue
+                elif i == 4:
+                    if not self.FLM_helper.CheckBox_FluoChannel5.isChecked():
+                        channel = channel + 1
+                        continue
+
+                if self.FLM_helper.PushButton_MIP.isChecked():
+                    array_norm = clahe.apply(np.max(img[:,:,:,channel],axis=0))
                 else:
-                    array_sum += array_norm_lut
-                array = np.moveaxis(array_sum, 0, -1)
+                    # local contrast enhancement
+                    array_norm = clahe.apply(img[slice,:,:,channel])
+
+                array_norm = cv2.addWeighted(array_norm, self.contrast, array_norm, 0, self.brightness)
+
+
+                #create lut
+                projColor = np.array(self.colordict[colors[i]],dtype=np.uint8)
+                scale = np.array([ i/256.0 for i in range (0,256)]).clip(0,1) #a little brightness,contrast enhancement
+                LUT = np.tile(projColor,[1,256])
+                LUT = np.array([ np.round(LUT[:,i] * scale) for i in range(3)],dtype=np.uint8)
+                array_norm_lut= np.array([cv2.LUT(array_norm, LUT[i,:]) for i in range(3)])
+                # the next three lines slow the slice-sweeping a little down. Consider optimizing
+                #array_normalized = cv2.normalize(array_unnormalized, None, alpha=0, beta=1.2, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)                    
+                #array_normalized = np.clip(array_normalized, 0, 1)
+                #array_normalized = (255*array_normalized).astype(np.uint8)
+
+                #array_norm_lut = array_norm_lut/array_norm_lut.max() * 255.0
+                channel = channel + 1
+                array_sum += array_norm_lut.astype(np.uint8)
+
+            array = np.moveaxis(array_sum,0,-1)
         if array.dtype == np.uint16:
-            array = cv2.convertScaleAbs(array, alpha=(255.0 / 65535.0))
-        width, height,  = np.shape(array)[:2]
+            array = cv2.convertScaleAbs(array, alpha=(255.0/65535.0))        
+        height,width=np.shape(array)[:2]
         ##TODO: Adjust historgam
         if len(img.shape) == 4:
-            qImg = QtGui.QImage(array.data.tobytes(), width, height,
-                                QtGui.QImage.Format_RGB888)  # QtGui.QImage.Format_RGBA8888)
+            qImg=QtGui.QImage(array.data.tobytes(), width, height, QtGui.QImage.Format_RGB888)#QtGui.QImage.Format_RGBA8888)
         else:
-            qImg = QtGui.QImage(array.data.tobytes(), width, height, QtGui.QImage.Format_Grayscale8)
-        try:
-            pixmapImg = QtGui.QPixmap.fromImage(qImg)
+            qImg=QtGui.QImage(array.astype(np.uint8), width, height, QtGui.QImage.Format_Grayscale8)
+        try:    
+            pixmapImg=QtGui.QPixmap.fromImage(qImg)
         except:
             print(sys.exc_info())
             return
         # Set scene size to image size.
-        scene = self.get_scene()
+        scene=self.get_scene()
         scene.clear()
         self.graphicsView.setScene(scene)
-        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect()))
-        self.graphicsView.fitInView(self.graphicsView.sceneRect(), self.graphicsView.aspectRatioMode)
-        # Add Image as pixmap to scene
+        self.graphicsView.setSceneRect(QtCore.QRectF(pixmapImg.rect())) 
+        self.graphicsView.fitInView(self.graphicsView.sceneRect(),self.graphicsView.aspectRatioMode)
+        #Add Image as pixmap to scene
         scene.addPixmap(pixmapImg)
         # Update SceneBuffer
         self.scene = scene
