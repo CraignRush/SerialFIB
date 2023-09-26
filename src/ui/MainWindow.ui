@@ -427,7 +427,7 @@
      <x>0</x>
      <y>0</y>
      <width>1070</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -478,11 +478,22 @@
     <addaction name="actionSet_Custom_Protocol"/>
     <addaction name="actionSet_Custom_Milling"/>
    </widget>
+   <widget class="QMenu" name="menuFLM">
+    <property name="title">
+     <string>FLM</string>
+    </property>
+    <addaction name="actionCalibrate_Pos_manually"/>
+    <addaction name="actionCalibrate_Pos_automatically"/>
+    <addaction name="actionGoto_FLM"/>
+    <addaction name="actionGoto_SEM"/>
+    <addaction name="actionLoad_Test_Stack"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
    <addaction name="menuCorrelation"/>
    <addaction name="menuSettings"/>
    <addaction name="menuTesting"/>
+   <addaction name="menuFLM"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
@@ -618,6 +629,31 @@
   <action name="actionSet_Custom_Milling">
    <property name="text">
     <string>Set Custom Milling</string>
+   </property>
+  </action>
+  <action name="actionCalibrate_Pos_manually">
+   <property name="text">
+    <string>Calibrate Pos manually</string>
+   </property>
+  </action>
+  <action name="actionCalibrate_Pos_automatically">
+   <property name="text">
+    <string>Calibrate Pos automatically</string>
+   </property>
+  </action>
+  <action name="actionGoto_FLM">
+   <property name="text">
+    <string>Goto FLM</string>
+   </property>
+  </action>
+  <action name="actionGoto_SEM">
+   <property name="text">
+    <string>Goto FIBSEM</string>
+   </property>
+  </action>
+  <action name="actionLoad_Test_Stack">
+   <property name="text">
+    <string>Load Test Stack</string>
    </property>
   </action>
  </widget>

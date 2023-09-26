@@ -200,7 +200,7 @@ class Ui_MainWindow(object):
         GUI Setup as created by pyuic
         '''
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1070, 917)
+        MainWindow.resize(2140, 1834)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
