@@ -1,0 +1,69 @@
+import math, pathlib, cv2, datetime
+from time import sleep
+import numpy as np
+import csv
+
+def robust_rotation(angle):    
+    newPos = fibsem.getStagePosition()
+    while round(angle,3) != round(newPos['r'],3):
+        pos['r'] = angle + np.deg2rad(2)   
+        fibsem.moveStageAbsolute(pos) 
+        sleep(1)   
+        pos['r'] = angle  
+        fibsem.moveStageAbsolute(pos)
+        sleep(1)   
+        newPos = fibsem.getStagePosition()
+
+deltaR_deg = 90
+itrations = 4
+output_dir=r'D:/User Data/Johann/220922_MeteorAutomation/' + datetime.datetime.now().strftime(r'%y%m%d_%H%M%S_') + str(deltaR_deg) + 'deg_'+ str(itrations) +'_MovementTest'
+# Define Start position
+pos = fibsem.getStagePosition()
+pos['x'] = 2.01915e-3
+pos['y'] = 4.996e-3
+pos['z'] = 35.412e-3
+pos['t'] = 0.0
+r = 0.0 # radians!
+pos['r'] = r
+print(pos)
+
+
+
+
+
+# Go to zero position
+fibsem.moveStageAbsolute(pos)
+robust_rotation(0.0)
+pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
+deltaR = np.deg2rad(deltaR_deg)
+fibsem.set_HFW("ELECTRON", 3e-4)
+positions = []
+
+
+
+
+for i in range(itrations):
+    # Save position data and image
+    img_reference = fibsem.take_image_EB()
+    cv2.imwrite(output_dir + 'raw_image_{}deg.jpg'.format(i*deltaR_deg), img_reference.data)    
+    positions.append(fibsem.getStagePosition())
+
+    # Move to new angle
+    r_new = r - (i+1) * deltaR
+    robust_rotation(r_new)
+    positions[-1]['x'] = positions[-1]['x'] * np.cos(r_new)
+    positions[-1]['y'] = positions[-1]['y'] * np.sin(r_new)
+    fibsem.moveStageAbsolute(positions[-1])
+
+
+
+# Export position list
+keys = positions[0].keys()
+with open(output_dir+"/position_data.csv", 'w', newline='\n') as f:
+    write = csv.DictWriter(f, keys)      
+    write.writeheader()
+    write.writerows(positions)
+
+
+
+

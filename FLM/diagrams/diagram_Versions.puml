@@ -1,0 +1,42 @@
+@startuml
+
+
+node "LAN-Network" {
+  component MicroscopePC [
+  MicroscopePC  
+  Windows
+  Python 3.6
+]
+
+component MeteorPC [
+  MeteorPC  
+  Ubuntu
+  Python 3.8
+]
+  package "TFS Scios" {    
+    [METEOR] -left- [FIBSEM]    
+    component DriverPC [
+      DriverPC  
+      Windows
+      Python 3.6
+    ]
+    [FIBSEM] -left- DriverPC
+  }
+   AutoScript4  -up- DriverPC
+   AutoScript4 -up- [FIBSEM] 
+cloud "SerialFIB"{
+    LamellaPrep -- AutoScript4
+}
+
+
+
+MicroscopePC -up- DriverPC : KVM Switch
+MicroscopePC -up- [AutoScript4]
+[MeteorPC] -- AutoScript4
+[MeteorPC] -up-[METEOR] : customAPI  
+
+MicroscopePC <.> [MeteorPC] : VNC
+}
+
+
+@enduml

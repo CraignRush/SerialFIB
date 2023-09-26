@@ -1,0 +1,121 @@
+### User Input ###
+from genericpath import exists
+import math
+import cv2
+import numpy as np
+import csv
+import datetime
+from pathlib import Path
+
+deltaR_deg = 2.5
+itrations = 10
+output_dir=r'D:/User Data/Johann/220922_MeteorAutomation/' + datetime.datetime.now().strftime(r'%y%m%d_%H%M%S_') + str(deltaR_deg) + 'deg_'+ str(itrations) +'_MovementTest'
+Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+def printPositionNicely(position):
+    print('Position / mm:\nx: {}\ny: {}\nz: {}\nt: {}\nr: {} {}'.format( \
+        round(position['x']*1e3,4), round(position['y']*1e3,4), \
+        round(position['z']*1e3,4), round(position['t']*57.2968,2),\
+        round(position['r']*57.2968,2), \
+        round((float(position['r'])*57.2968)-360,2)))
+
+
+###############################
+### Definition of variables ###
+###############################
+fibsem.output_dir   = output_dir + '/'
+stagepos            = fibsem.getStagePosition()
+deltaR = deltaR_deg * math.pi / 180
+fibsem.set_HFW("ELECTRON", 3e-3)
+pos=stagepos
+x=pos['x']
+y=pos['y']
+z=pos['z']
+t=pos['t']
+r=pos['r']
+
+rotationPositionsAligned = []
+
+img_0_reference = fibsem.take_image_EB()
+for i in range(itrations):
+    img_reference = fibsem.take_image_EB()
+    cv2.imwrite(fibsem.output_dir + 'raw_image_{}deg.jpg'.format(i*deltaR_deg), img_reference.data)
+    height, width = np.shape(img_0_reference.data)[0], np.shape(img_0_reference.data)[1]
+    center = (width/2, height/2)
+    rotate_matrix = cv2.getRotationMatrix2D(center=center, angle=i*deltaR_deg, scale=1)
+    rotate_image = cv2.warpAffine(src=img_0_reference.data, M=rotate_matrix, dsize=(width, height))
+    cv2.imwrite(fibsem.output_dir + 'rotated_image_{}deg.jpg'.format(i*deltaR_deg), rotate_image)
+    #img_reference.data = rotate_image
+
+    grid1_center = {'x': 0.001, 'y': 0.001}
+    x1 = x - grid1_center['x'] * math.cos(r)
+    y1 = y - grid1_center['y'] * math.sin(r)
+    r1 = r - (i+1) * deltaR
+
+    print('x1: {}\ny1: {}\nr: {}'.format(x1*1e3,y1*1e3, r*180/math.pi))
+
+
+    #rel_move={'x':-2*x, 'y':-2*y ,'z':0,'r':3.14159,'t':-0.191986}
+    abs_move={'x':x, 'y':y ,'z':z,'r':r1,'t':t}
+    fibsem.moveStageAbsolute(abs_move)
+    
+    fibsem.align(img_reference,'ELECTRON',current=13e-12, NO_BEAMSHIFT=True)
+
+    rotationPositionsAligned.append(fibsem.getStagePosition())
+    printPositionNicely(rotationPositionsAligned[i])
+
+keys = rotationPositionsAligned[0].keys()
+with open(fibsem.output_dir + "position_data.csv", 'w', newline='\n') as f:
+    write = csv.DictWriter(f, keys)      
+    write.writeheader()
+    write.writerows(rotationPositionsAligned)
+
+rotationPositionsAlignedHR = rotationPositionsAligned
+
+for i in range(0,len(rotationPositionsAlignedHR)):
+    rotationPositionsAlignedHR[i]['x'] = rotationPositionsAligned[i]['x']*1e3
+    rotationPositionsAlignedHR[i]['y'] = rotationPositionsAligned[i]['y']*1e3
+    rotationPositionsAlignedHR[i]['z'] = rotationPositionsAligned[i]['z']*1e3
+    rotationPositionsAlignedHR[i]['t'] = rotationPositionsAligned[i]['t'] / math.pi * 180
+    rotationPositionsAlignedHR[i]['r'] = rotationPositionsAligned[i]['r'] / math.pi * 180
+
+with open(fibsem.output_dir + "position_data_HR.csv", 'w', newline='\n') as f:
+    write = csv.DictWriter(f, keys)      
+    write.writeheader()
+    write.writerows(rotationPositionsAlignedHR)
+
+
+
+
+
+
+
+
+#
+
+#rel_move={'x':-0026e-03, 'y':-0.71e-03 ,'z':0,'r':0,'t':0}
+
+#fibsem.moveStageRelative(rel_move)
+pos2=fibsem.getStagePosition()
+x=pos2['x']
+t=pos2['t']
+r=pos2['r']
+y=pos2['y']
+z=pos2['z']
+
+correction = {'x':0.0279e-3,'y':0.0688e-3,'z':0.0282e-3} #:
+offset=float(z)-float(y)
+
+meteor_x=float(x)+49.36e-03+correction['x']
+meteor_y=(4.185e-03-float(offset))/2.036+correction['y']
+meteor_z=((-1.036)*meteor_y)+4.185e-03+correction['z']
+
+print(meteor_x)
+print(meteor_y)
+print(meteor_z)
+
+print(pos)
+
+pos_meteor={'x':meteor_x,'y':meteor_y,'z':meteor_z,'t':t,'r':r}
+#print(pos_meteor)
+fibsem.moveStageAbsolute(pos_meteor)

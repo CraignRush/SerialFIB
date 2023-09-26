@@ -1,0 +1,97 @@
+from cmath import sin
+import math, pathlib, cv2, datetime
+from time import sleep
+import numpy as np
+import csv
+
+
+def robust_rotation(angle, VERBOSE=False):    
+    newPos = fibsem.getStagePosition()
+    newPos['r'] = angle  
+    fibsem.moveStageAbsolute(newPos)
+    while round(angle,3) != round(newPos['r'],3):
+        if VERBOSE:
+            print(round(angle,3))
+            print(round(newPos['r'],3))
+            print(np.rad2deg(newPos['r']))
+
+
+        newPos['r'] = angle + np.deg2rad(2)   
+        fibsem.moveStageAbsolute(newPos) 
+        sleep(0.5)   
+        newPos['r'] = angle  
+        fibsem.moveStageAbsolute(newPos)
+        sleep(0.5)   
+        newPos = fibsem.getStagePosition()
+
+
+import math
+def rotate(origin, point, angle, VERBOSE=False):
+    """
+    Rotate a point counterclockwise by a given angle around a given origin.
+
+
+    The angle should be given in radians.
+    """
+    ox, oy = origin
+    px, py = point
+
+
+    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
+    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+    if VERBOSE:        
+        print('New Coordinates: {}, {}, {} deg'.format(qx * 1e3, qy*1e3, np.rad2deg(angle)))
+    return qx, qy
+
+
+origin =  [-0.25408e-3, 1.23574e-3] # [-0.012835666953944112e-3, 0.01302956726072679e-3]
+deltaR_deg = -90
+iterations = 4
+output_dir=r'D:/User Data/Johann/220922_MeteorAutomation/' + datetime.datetime.now().strftime(r'%y%m%d_%H%M%S_') + str(deltaR_deg) + 'deg_'+ str(iterations) +'_MovementTest'
+# Define Start position
+pos = fibsem.getStagePosition()
+pos['x'] = 2.01915e-3
+pos['y'] = 4.996e-3
+pos['z'] = 35.412e-3
+pos['t'] = 0.0
+r = 0.0 # radians!
+pos['r'] = r
+
+
+# Go to zero position
+fibsem.moveStageAbsolute(pos)
+robust_rotation(0.0)
+pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
+deltaR = np.deg2rad(deltaR_deg)
+fibsem.set_HFW("ELECTRON", 3e-4)
+img_reference = fibsem.take_image_EB()
+positions = [] 
+
+
+for i in range(iterations):
+    # Move to new angle
+    r_new = (i+1) * deltaR
+
+    radius_new = math.sqrt((pos['x'] - origin[0])**2 + (pos['y'] - origin[1]) ** 2)
+
+    positions = fibsem.getStagePosition()
+    positions['x'] = (np.cos(r_new) * (pos['x'] - origin[0]) - (pos['y']-origin[1])  * np.sin(r_new) + origin[0])
+    positions['y'] = (np.sin(r_new) * (pos['x'] - origin[0]) + (pos['y']-origin[1])  * np.cos(r_new) + origin[1])
+    positions['r'] = -r_new
+    fibsem.moveStageAbsolute(positions)    
+
+    # Save position data and image
+    img_reference = fibsem.take_image_EB()
+    cv2.imwrite(output_dir + 'raw_image_{}deg.jpg'.format(i*deltaR_deg), img_reference.data)    
+
+
+
+
+
+
+
+
+
+
+#
+

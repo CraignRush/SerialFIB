@@ -1,5 +1,6 @@
 # SerialFIB log
-SFIB.log
+*.log
+*.tiff
 
 #Cache
 src/__pycache__
@@ -16,3 +17,7 @@ src/Zeiss/.ipynb_checkpoints
 .DS_Store
 .vscode/launch.json
 SFIB.log
+client.log
+SFIB.log
+.idea/
+*.pyc
