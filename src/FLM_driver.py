@@ -69,6 +69,10 @@ class FLM():  # ,CAMERA_CONFIG):
         self.cam_exposure = 0.01
         self.cam_set_exposure(self.cam_exposure)
 
+        self.autofocus_channel = 'reflection'
+        self.autofocus_intensity = 8.
+        self.autofocus_exposure = 0.01
+
         # A little dangerous: Initializing the autofocus with a saved "rough" focus position
         self.autofocus_result: dict = {'z': config.ROUGH_FOCUS_POS}
         
@@ -495,8 +499,8 @@ class FLM():  # ,CAMERA_CONFIG):
             focus = self.autofocus_result
 
         try:
-            self.light_set_channel('reflection', 8)
-            self.cam_set_exposure(0.01)
+            self.light_set_channel(self.autofocus_channel, self.autofocus_intensity)
+            self.cam_set_exposure(self.autofocus_exposure)
             stack = self.get_raw_stack(stack_step, slices, focus)
         except:
             logger_server.debug('Autofocus could not acquire a stack!')
